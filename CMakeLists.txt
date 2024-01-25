@@ -109,3 +109,41 @@ ENDIF()
 if (BUILD_SV_INSTALLER) 
     add_subdirectory("${CMAKE_SOURCE_DIR}/Distribution")
 ENDIF()
+
+
+
+add_library(OneDSolver_core
+        ${SRC_C}
+        ${SRC_H})
+add_library(OneDSolver_lib INTERFACE)
+target_link_libraries(OneDSolver_lib INTERFACE OneDSolver_core)
+target_include_directories(OneDSolver_lib INTERFACE )
+target_include_directories(OneDSolver_lib INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Code/Source>
+        $<INSTALL_INTERFACE:include/onedsolver/>
+)
+
+add_executable(OneDSolverv2 Code/Source/main.cxx)
+target_link_libraries(OneDSolverv2 PUBLIC OneDSolver_lib)
+install(TARGETS OneDSolver_lib OneDSolver_core
+        EXPORT OneDSolver_libTargets
+        ARCHIVE LIBRARY PUBLIC_HEADER
+)
+
+install(EXPORT OneDSolver_libTargets
+        NAMESPACE OneDSolver::
+        DESTINATION lib/cmake/onedsolver
+)
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(cmake/onedsolver_libConfig.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/onedsolver_libConfig.cmake
+        INSTALL_DESTINATION lib/cmake/onedsolver
+)
+
+install(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/onedsolver_libConfig.cmake
+        DESTINATION lib/cmake/onedsolver
+)
+
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/src/ DESTINATION include/onedsolver FILES_MATCHING PATTERN "*.h*")
