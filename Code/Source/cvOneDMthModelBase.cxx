@@ -137,6 +137,8 @@ void cvOneDMthModelBase::SetBoundaryConditions(){
       (*currSolution)[eqNumbers[1]] = GetFlowRate();
       break;
       case BoundCondTypeScope::COUPLING_3D_1D:
+          // store here the equation number
+          //inletpressure_List.push_back(eqNumbers[0]);
           (*currSolution)[eqNumbers[1]] = GetFlowRate();
           break;
 
@@ -605,6 +607,18 @@ void cvOneDMthModelBase::SetInflowRate(double *t, double *flow, int size, double
   }
   cycleTime = cycleT;
   nFlowPts = size; //added by bnsteel
+}
+
+int cvOneDMthModelBase::Get_Pressure_Position(){
+    if(inletpressure_List.size()>1){
+        std::cout<<"Congratulations, currently we only support 1 coupling Condition. Feel free to add some more."<< std::endl;
+        throw "FAIL";
+    }
+    if( inletpressure_List.empty()){
+        return 0;
+    }
+
+    return inletpressure_List.front();
 }
 
 void cvOneDMthModelBase::UpdateInflowRate(double flow,int i) {

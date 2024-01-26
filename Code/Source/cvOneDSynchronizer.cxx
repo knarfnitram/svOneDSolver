@@ -48,11 +48,16 @@ int cvOneDSynchronizer::calculate_step(double time){
 double cvOneDSynchronizer::Get_3d_q_at_t(double t){
     std::cout<<"yes"-calculate_step(t)<<"";
     return q_3d[calculate_step(t)];
-
 }
+
+double cvOneDSynchronizer::Get_1d_p_at_t(double t){
+    return p_1d[calculate_step(t)];
+}
+
+
 void cvOneDSynchronizer::Set_1D_p_at_t(double t,double p){
-    std::cout<<"Set_1D_p_at_t - yes"<<"";
-    //return 1.0;
+    p_1d[calculate_step(t)]=p;
+
 }
 
 // to get data

@@ -74,6 +74,7 @@ class cvOneDMthModelBase{
     virtual void EquationInitialize(const cvOneDFEAVector* pSolution, cvOneDFEAVector* cSolution){prevSolution = pSolution; currSolution = cSolution;}
     virtual void SetInflowRate(double *t, double *flow, int size, double cycleT);
     virtual void UpdateInflowRate(double flow, int size);
+    virtual int Get_Pressure_Position();
     typeOfEquation GetType() const {return type;}
     double GetCycleTime() const {return cycleTime;}
 
@@ -92,6 +93,8 @@ class cvOneDMthModelBase{
     vector<cvOneDSubdomain*> subdomainList;
     vector<cvOneDFEAJoint*> jointList;
     vector<int> outletList;
+    // list containing the node id of the pressure for coupling
+    vector<long> inletpressure_List;
     // Placement of equations in the globalsystem
     long* equationNumbers;
 

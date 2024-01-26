@@ -1554,10 +1554,19 @@ void cvOneDBFSolver::GenerateSolution(void){
         break;
       }
 
-      double new_flow=synchronizer->Get_3d_q_at_t(currentTime);
-      //synchronizer->Set_1D_p_at_t(currentTime,0);
-      mathModels[0]->UpdateInflowRate(new_flow,step);
 
+
+      double new_flow=synchronizer->Get_3d_q_at_t(currentTime);
+
+      // the inlet condition is set per default on the first position
+      long eqNumbers[2];
+      mathModels[0]->GetNodalEquationNumbers( 0, eqNumbers, 0);
+      synchronizer->Set_1D_p_at_t(currentTime,0);
+      mathModels[0]->UpdateInflowRate(new_flow,step);
+      // we use this assumption to extract the area and calculate the pressure:
+      cvOneDMaterial* curMat = subdomainList[0]->GetMaterial();
+      double area=currentSolution-> GetEntries()[eqNumbers[0]];
+      synchronizer->Set_1D_p_at_t(currentTime,curMat->GetPressure(area,0));
     // Increment Iteration Number
     iter++;
 
