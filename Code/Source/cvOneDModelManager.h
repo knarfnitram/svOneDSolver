@@ -39,6 +39,7 @@
 # include "cvOneDGlobal.h"
 # include "cvOneDException.h"
 # include "cvOneDModel.h"
+#include "cvOneDSynchronizer.h"
 
 class cvOneDModelManager{
   public:
@@ -78,7 +79,11 @@ class cvOneDModelManager{
                    long maxStep,long quadPoints,
                    int len,char* boundType,double* values,
                    double* times,double conv, int useIV, int usestab);
-
+    // SOLVE COUPLED MODEL
+    int SolveCoupledModel(double dt, long stepSize,
+                              long maxStep, long quadPoints,
+                              int len, char* boundType, double* values,
+                              double* times, double conv, int useIV, int usestab,cvOneDSynchronizer sync);
 };
 
 #endif // CVONEDMODELMANAGER_H

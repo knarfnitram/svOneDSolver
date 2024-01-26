@@ -3,8 +3,9 @@
  %{
  /* Includes the header in the wrapper code */
  #include "cvOneDOptions.h"
- #include "main.h"
- using namespace std;
+ #include "OneDSolverv2.h"
+
+using namespace std;
  %}
 
  /* Parse the header file to generate wrappers */

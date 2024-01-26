@@ -52,6 +52,7 @@
 # include "cvOneDSubdomain.h"
 # include "cvOneDMthModelBase.h"
 # include "cvOneDFEAJoint.h"
+# include "cvOneDSynchronizer.h"
 
 using namespace std;
 
@@ -71,6 +72,10 @@ class cvOneDBFSolver{
     static void SetModelPtr(cvOneDModel *mdl);
     static cvOneDModel* GetModelPtr(){return model;}
 
+    // Set Synchronizer
+    static void SetSynchronizerPtr(cvOneDSynchronizer sync){
+        synchronizer = &sync;
+    };
     // Solve the blood flow problem
     static void Solve(void);
 
@@ -96,7 +101,6 @@ class cvOneDBFSolver{
 
     // Find Segment index given the ID
     static int getSegmentIndex(int segID);
-
  private:
 
     // Query Model, Allocate Memory, Set Initial Conditions
@@ -114,6 +118,7 @@ class cvOneDBFSolver{
 
     // Pointer to the Model
     static cvOneDModel *model;
+    static cvOneDSynchronizer* synchronizer;
 
     static vector<cvOneDSubdomain*> subdomainList;
     static vector<cvOneDFEAJoint*> jointList;
@@ -138,6 +143,7 @@ class cvOneDBFSolver{
     static double *flowTime;
 	static double Period;
 	static double convCriteria;
+
 
 };
 

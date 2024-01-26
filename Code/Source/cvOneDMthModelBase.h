@@ -73,6 +73,7 @@ class cvOneDMthModelBase{
     virtual long GetUpmostEqnNumber(long ele, long ith) =0;
     virtual void EquationInitialize(const cvOneDFEAVector* pSolution, cvOneDFEAVector* cSolution){prevSolution = pSolution; currSolution = cSolution;}
     virtual void SetInflowRate(double *t, double *flow, int size, double cycleT);
+    virtual void UpdateInflowRate(double flow, int size);
     typeOfEquation GetType() const {return type;}
     double GetCycleTime() const {return cycleTime;}
 

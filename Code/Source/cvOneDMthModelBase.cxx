@@ -136,6 +136,9 @@ void cvOneDMthModelBase::SetBoundaryConditions(){
     case BoundCondTypeScope::FLOW:
       (*currSolution)[eqNumbers[1]] = GetFlowRate();
       break;
+      case BoundCondTypeScope::COUPLING_3D_1D:
+          (*currSolution)[eqNumbers[1]] = GetFlowRate();
+          break;
 
     case BoundCondTypeScope::PRESSURE_WAVE:
       (*currSolution)[eqNumbers[0]] = sub->GetMaterial()->GetArea(GetFlowRate(),0);
@@ -162,7 +165,7 @@ void cvOneDMthModelBase::SetBoundaryConditions(){
     case BoundCondTypeScope::PRESSURE:
       (*currSolution)[eqNumbers[0]] = sub->GetBoundFlowRate();
       break;
-    case BoundCondTypeScope::FLOW:
+    case BoundCondTypeScope::FLOW or BoundCondTypeScope::COUPLING_3D_1D:
       (*currSolution)[eqNumbers[1]] = sub->GetBoundFlowRate();
       break;
     case BoundCondTypeScope::RESISTANCE:
@@ -196,7 +199,7 @@ double cvOneDMthModelBase::CheckMassBalance(){
   long eqNumbers[2];  // Two degress of freedom per node
   double inletFlow = GetFlowRate();
 
-  if(cvOneDBFSolver::inletBCtype == BoundCondTypeScope::FLOW){
+  if(cvOneDBFSolver::inletBCtype == BoundCondTypeScope::FLOW or cvOneDBFSolver::inletBCtype ==BoundCondTypeScope::FLOW ){
     inletFlow = GetFlowRate();
   }else{
    GetNodalEquationNumbers( 0, eqNumbers, 0);
@@ -233,7 +236,7 @@ void cvOneDMthModelBase::ApplyBoundaryConditions(){
     // Set up the inlet Dirichlet boundary condition (flow rate)
     // RHS corresponding to imposed Essential BC
     value = 0.0;
-    if(cvOneDBFSolver::inletBCtype == BoundCondTypeScope::FLOW){
+    if(cvOneDBFSolver::inletBCtype == BoundCondTypeScope::FLOW or cvOneDBFSolver::inletBCtype == BoundCondTypeScope::COUPLING_3D_1D){
       GetNodalEquationNumbers(0, eqNumbers, 0);
       cvOneDGlobal::solver->SetSolution(eqNumbers[1], value);
     }else if (cvOneDBFSolver::inletBCtype == BoundCondTypeScope::PRESSURE_WAVE){
@@ -262,7 +265,10 @@ void cvOneDMthModelBase::ApplyBoundaryConditions(){
         case BoundCondTypeScope::PRESSURE_WAVE:
           cvOneDGlobal::solver->SetSolution( eqNumbers[0], value);
           break;
-        case BoundCondTypeScope::FLOW:
+          case BoundCondTypeScope::FLOW:
+          cvOneDGlobal::solver->SetSolution( eqNumbers[1], value);
+          break;
+        case BoundCondTypeScope::COUPLING_3D_1D:
           cvOneDGlobal::solver->SetSolution( eqNumbers[1], value);
           break;
 
@@ -316,7 +322,7 @@ void cvOneDMthModelBase::ApplyBoundaryConditions(){
       // for these BC the Inlet term doesn't have to be specialized
       // so same treatment as regular Essential BC like in Brooke's
       value = 0.0;  // RHS corresponding to imposed Essential BC
-      if(cvOneDBFSolver::inletBCtype == BoundCondTypeScope::FLOW){
+      if(cvOneDBFSolver::inletBCtype == BoundCondTypeScope::FLOW or cvOneDBFSolver::inletBCtype == BoundCondTypeScope::COUPLING_3D_1D){
         GetNodalEquationNumbers( 0, eqNumbers, 0);
         cvOneDGlobal::solver->SetSolution( eqNumbers[1], value);
       }else if (cvOneDBFSolver::inletBCtype == BoundCondTypeScope::PRESSURE_WAVE){
@@ -393,6 +399,10 @@ void cvOneDMthModelBase::ApplyBoundaryConditions(){
           case BoundCondTypeScope::FLOW:
             cvOneDGlobal::solver->SetSolution( eqNumbers[1], value);
             break;
+            case BoundCondTypeScope::COUPLING_3D_1D:
+                cvOneDGlobal::solver->SetSolution( eqNumbers[1], value);
+                break;
+
 
           case BoundCondTypeScope::RESISTANCE:
 
@@ -595,6 +605,25 @@ void cvOneDMthModelBase::SetInflowRate(double *t, double *flow, int size, double
   }
   cycleTime = cycleT;
   nFlowPts = size; //added by bnsteel
+}
+
+void cvOneDMthModelBase::UpdateInflowRate(double flow,int i) {
+
+    //cout<<"Time and flow rate bevore update: " << time[i] << ", " << flrt[i] << endl;
+    //time[i] = t[i];
+    if(i > nFlowPts)    std::cout<<" you are exceeding the array size of nFlowPts"<<std::endl;
+
+    //cout<<"Time and flow rate bevore after: " << time[i] << ", " << flrt[i] << endl;
+    double correctedTime = currentTime - static_cast<long>(currentTime / cycleTime) * cycleTime;
+    int ptr = 0;
+    bool wasFound = false;
+    while( !wasFound){
+        if( correctedTime >= time[ptr] && correctedTime <= time[ptr+1])
+            wasFound = true;
+        else
+            ptr++;
+    }
+    flrt[ptr] = flow;
 }
 
 double cvOneDMthModelBase::GetFlowRate(){

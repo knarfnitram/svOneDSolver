@@ -38,6 +38,7 @@
 # include "cvOneDMaterial.h"
 # include "cvOneDMthSegmentModel.h"
 # include "cvOneDMthBranchModel.h"
+# include "cvOneDSynchronizer.h"
 
 #ifndef WIN32
 #define _USE_MATH_DEFINES
@@ -94,6 +95,7 @@ long                          cvOneDBFSolver::numFlowPts = 0;
 double                        cvOneDBFSolver::convCriteria = 0;
 BoundCondType                 cvOneDBFSolver::inletBCtype;
 int                           cvOneDBFSolver::ASCII = 1;
+cvOneDSynchronizer *          cvOneDBFSolver::synchronizer;
 
 // SET MODE PTR
 void cvOneDBFSolver::SetModelPtr(cvOneDModel *mdl){
@@ -1239,7 +1241,6 @@ void cvOneDBFSolver::SetInletBCType(BoundCondType bc){inletBCtype = bc;}
 void cvOneDBFSolver::SetMaxStep(long maxs){maxStep = maxs;}
 void cvOneDBFSolver::SetQuadPoints(long point){quadPoints = point;}
 void cvOneDBFSolver::SetConvergenceCriteria(double conv){convCriteria = conv;}
-
 void cvOneDBFSolver::CreateGlobalArrays(void){
     assert( wasSet == false);
     long neq = mathModels[0]->GetTotalNumberOfEquations();
@@ -1446,7 +1447,7 @@ void cvOneDBFSolver::GenerateSolution(void){
       }
 
       mathModels[0]->ApplyBoundaryConditions();
-
+        cout<<" --- RHS: After Application of BC " << endl;
       // PRINT RHS AFTER BC APP
       if(cvOneDGlobal::debugMode){
         cout<<" --- RHS: After Application of BC " << endl;
@@ -1477,9 +1478,9 @@ void cvOneDBFSolver::GenerateSolution(void){
 
       // Add increment
       increment->Clear();
-
+        cout<<" --- Start solving " << endl;
       cvOneDGlobal::solver->Solve(*increment);
-
+        cout<<" --- Done solving " << endl;
       currentSolution->Add(*increment);
 
       // If the area goes less than zero, it tells in which segment the error occurs.
@@ -1549,8 +1550,13 @@ void cvOneDBFSolver::GenerateSolution(void){
       if(iter > MAX_NONLINEAR_ITERATIONS){
         cout << "Error: Newton not converged, exceed max iterations" << endl;
         cout << "norm of Flow rate:" << normf << ", norm of Area:" << norms << endl;
+          //throw "NEwton";
         break;
       }
+
+      double new_flow=synchronizer->Get_3d_q_at_t(currentTime);
+      //synchronizer->Set_1D_p_at_t(currentTime,0);
+      mathModels[0]->UpdateInflowRate(new_flow,step);
 
     // Increment Iteration Number
     iter++;

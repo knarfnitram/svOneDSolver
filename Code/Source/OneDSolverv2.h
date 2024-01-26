@@ -39,7 +39,27 @@
 # include "cvOneDOptions.h"
 # include "cvOneDDataTable.h"
 # include "cvOneDException.h"
+# include "cvOneDSynchronizer.h"
 
 using namespace std;
-void WriteHeader();
-void runOneDSolver(string inputFile);
+//void WriteHeader();
+//void runOneDSolver(string inputFile);
+
+class OneDSolverv2 {
+public:
+
+
+
+    int getDataTableIDFromStringKey(string key);
+
+    void createAndRunModel(cvOneDOptions *opts, cvOneDSynchronizer synch);
+
+    void readModelFile(string inputFile, cvOneDOptions *opts, cvStringVec includedFiles);
+
+    void readModel(string inputFile, cvOneDOptions *opts);
+
+    void SetupCoupling();
+
+
+
+};

@@ -30,6 +30,7 @@
  */
 
 #include "cvOneDModelManager.h"
+#include "cvOneDSynchronizer.h"
 
 cvOneDModelManager::cvOneDModelManager(char *mdlName){
   // We're creating a model
@@ -80,8 +81,10 @@ int cvOneDModelManager::CreateSegment(char   *segName,long segID, double  segLen
   // convert char string to boundary condition type
   if(!strcmp(boundType, "NOBOUND")){
     boundT = BoundCondTypeScope::NOBOUND;
-  }else if(!strcmp(boundType, "PRESSURE")){
-    boundT = BoundCondTypeScope::PRESSURE;
+  }else if(!strcmp(boundType, "PRESSURE")) {
+      boundT = BoundCondTypeScope::PRESSURE;
+  }else if(!strcmp(boundType, "COUPLING_3D_1D")){
+      boundT = BoundCondTypeScope::COUPLING_3D_1D;
   }else if(!strcmp(boundType, "RESISTANCE")){
     boundT = BoundCondTypeScope::RESISTANCE;
   }else if(!strcmp(boundType, "PRESSURE_WAVE")){
@@ -145,6 +148,7 @@ int cvOneDModelManager::CreateSegment(char   *segName,long segID, double  segLen
   switch(boundT) {
   case BoundCondTypeScope::PRESSURE_WAVE:
       seg->setBoundPressureValue(value,time,num);
+          printf("yes-pressurewave");
       break;
   case BoundCondTypeScope::RESISTANCE_TIME:
       seg->setBoundResistanceValue(value,time,num);
@@ -163,6 +167,7 @@ int cvOneDModelManager::CreateSegment(char   *segName,long segID, double  segLen
 
   default:
       seg -> setBoundValue(value[0]);
+          printf("yes-pressure");
       break;
   }
 
@@ -212,7 +217,73 @@ int cvOneDModelManager::CreateJoint(char * jointName,double x,double y,double z,
 
   return CV_OK;
 }
+int cvOneDModelManager::SolveCoupledModel(double dt, long stepSize,
+                                   long maxStep, long quadPoints,
+                                   int len, char* boundType, double* values,
+                                   double* times, double conv, int useIV, int usestab, cvOneDSynchronizer sync){
 
+    BoundCondTypeScope::BoundCondType boundT;
+
+    // set the creation flag to off.
+    cvOneDGlobal::isCreating = false;
+
+    // convert char string to boundary condition type
+    if(!strcmp( boundType, "NOBOUND")){
+        boundT = BoundCondTypeScope::NOBOUND;
+        printf("Inlet Condition Type: NOBOUND\n");
+    }else if(!strcmp( boundType, "PRESSURE")){
+        boundT = BoundCondTypeScope::PRESSURE;
+        printf("Inlet Condition Type: PRESSURE\n");
+    }else if(!strcmp( boundType, "PRESSURE_WAVE")){
+        boundT = BoundCondTypeScope::PRESSURE_WAVE;
+        printf("Inlet Condition Type: PRESSURE_WAVE\n");
+    }else if(!strcmp( boundType, "FLOW")){
+        boundT = BoundCondTypeScope::FLOW;
+        printf("Inlet Condition Type: FLOW\n");
+    }else if(!strcmp( boundType, "COUPLING_3D_1D")){
+        boundT = BoundCondTypeScope::COUPLING_3D_1D;
+        printf("Inlet Condition Type: COUPLING_3D_1D\n");
+    }else if(!strcmp( boundType, "RESISTANCE")){
+        boundT = BoundCondTypeScope::RESISTANCE;
+        printf("Inlet Condition Type: RESISTANCE\n");
+    }else if(!strcmp( boundType, "RESISTANCE_TIME")){
+        boundT = BoundCondTypeScope::RESISTANCE_TIME;
+        printf("Inlet Condition Type: RESISTANCE_TIME\n");
+    }else if(!strcmp( boundType, "RCR")){
+        boundT = BoundCondTypeScope::RCR;
+        printf("Inlet Condition Type: RCR\n");
+    }else if(!strcmp( boundType, "CORONARY")){
+        boundT = BoundCondTypeScope::CORONARY;
+        printf("Inlet Condition Type: CORONARY\n");
+    }else{
+        return CV_ERROR;
+    }
+
+    // Set Solver Options
+    cvOneDMthSegmentModel::STABILIZATION = usestab; // 1=stabilization, 0=none
+    cvOneDGlobal::CONSERVATION_FORM = useIV;
+    cvOneDBFSolver::ASCII = 1;
+
+    cvOneDBFSolver::SetModelPtr(cvOneDGlobal::gModelList[cvOneDGlobal::currentModel]);
+
+    // We need to get these from the solver
+    cvOneDBFSolver::SetDeltaTime(dt);
+    cvOneDBFSolver::SetStepSize(stepSize);
+    cvOneDBFSolver::SetMaxStep(maxStep);
+    cvOneDBFSolver::SetQuadPoints(quadPoints);
+    cvOneDBFSolver::SetInletBCType(boundT);
+    cvOneDBFSolver::DefineInletFlow(times, values, len);
+    cvOneDBFSolver::SetConvergenceCriteria(conv);
+    cvOneDBFSolver::SetSynchronizerPtr(sync);
+
+    cvOneDGlobal::isSolving = true;
+
+    cvOneDBFSolver::Solve();
+
+    cvOneDGlobal::isSolving = false;
+
+    return CV_OK;
+}
 // ===========
 // SOLVE MODEL
 // ===========
@@ -239,6 +310,9 @@ int cvOneDModelManager::SolveModel(double dt, long stepSize,
   }else if(!strcmp( boundType, "FLOW")){
     boundT = BoundCondTypeScope::FLOW;
     printf("Inlet Condition Type: FLOW\n");
+  }else if(!strcmp( boundType, "COUPLING_3D_1D")){
+      boundT = BoundCondTypeScope::COUPLING_3D_1D;
+      printf("Inlet Condition Type: COUPLING_3D_1D\n");
   }else if(!strcmp( boundType, "RESISTANCE")){
     boundT = BoundCondTypeScope::RESISTANCE;
     printf("Inlet Condition Type: RESISTANCE\n");
@@ -270,6 +344,7 @@ int cvOneDModelManager::SolveModel(double dt, long stepSize,
   cvOneDBFSolver::SetInletBCType(boundT);
   cvOneDBFSolver::DefineInletFlow(times, values, len);
   cvOneDBFSolver::SetConvergenceCriteria(conv);
+
 
   cvOneDGlobal::isSolving = true;
 
