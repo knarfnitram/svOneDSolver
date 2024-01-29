@@ -46,11 +46,12 @@ int cvOneDSynchronizer::calculate_step(double time){
 }
 
 double cvOneDSynchronizer::Get_3d_q_at_t(double t){
-    std::cout<<"yes"-calculate_step(t)<<"";
+    std::cout<<"you requested 3d q at time step:"-calculate_step(t)<<"";
     return q_3d[calculate_step(t)];
 }
 
 double cvOneDSynchronizer::Get_1d_p_at_t(double t){
+    std::cout<<"you requested 1d presure data at time step:"-calculate_step(t)<<"";
     return p_1d[calculate_step(t)];
 }
 

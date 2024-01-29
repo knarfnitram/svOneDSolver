@@ -76,8 +76,23 @@ class cvOneDBFSolver{
     static void SetSynchronizerPtr(cvOneDSynchronizer sync){
         synchronizer = &sync;
     };
+    // initialize
+    static void Initialize(void);
+
     // Solve the blood flow problem
     static void Solve(void);
+
+    // perform one newton iteration
+    static bool Do_Newton_Step(int *iter);
+
+    // update the time_step variables
+    static void UpdateTimeStep(void);
+
+    // Synchronize the data after Newton iteration
+    static void SynchronizeDataofStep(int step);
+
+    // update the solution vector after time step and print newton iteration
+    static void UpdateSolution(int iter ,int step);
 
     // Get the solution;
     static double GetSolution(int i, int j){return TotalSolution[i][j];}//IV 082103
@@ -143,6 +158,16 @@ class cvOneDBFSolver{
     static double *flowTime;
 	static double Period;
 	static double convCriteria;
+    static double checkMass;
+
+
+    // postprocessing position to right timestep
+    static long q;
+
+    //    Newton-Raphson Variables
+    //static int iter ;
+    //static double normf ;
+    //static double norms ;
 
 
 };

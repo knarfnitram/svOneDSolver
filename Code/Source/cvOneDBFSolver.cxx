@@ -96,6 +96,8 @@ double                        cvOneDBFSolver::convCriteria = 0;
 BoundCondType                 cvOneDBFSolver::inletBCtype;
 int                           cvOneDBFSolver::ASCII = 1;
 cvOneDSynchronizer *          cvOneDBFSolver::synchronizer;
+double                        cvOneDBFSolver::checkMass=0.0;
+long                          cvOneDBFSolver::q=1;
 
 // SET MODE PTR
 void cvOneDBFSolver::SetModelPtr(cvOneDModel *mdl){
@@ -1350,87 +1352,69 @@ void cvOneDBFSolver::CalcInitProps(long ID){
   }
 }
 
-// =================
-// GENERATE SOLUTION
-// =================
-void cvOneDBFSolver::GenerateSolution(void){
-  currentTime = 0.0;
-  long i = 0;
-  clock_t tstart_iter;
-  clock_t tstart_solve;
-  clock_t tend_iter;
-  clock_t tend_solve;
+void cvOneDBFSolver::Initialize(void){
+    currentTime = 0.0;
+    long i = 0;
 
 
-  // Print the formulation used
+    // Print the formulation used
 
-  if(cvOneDGlobal::CONSERVATION_FORM){
-    cout << "Using Conservative Form ..." << endl;
-  }else{
-    cout << "Using Advective Form ..." << endl;
-  }
+    if(cvOneDGlobal::CONSERVATION_FORM){
+        cout << "Using Conservative Form ..." << endl;
+    }else{
+        cout << "Using Advective Form ..." << endl;
+    }
 
-  // Allocate the TotalSolution Array.
-  cout << "maxStep/stepSize: " << maxStep/stepSize << endl;
-  long numSteps = maxStep/stepSize;
-  TotalSolution.SetSize(numSteps+1, currentSolution -> GetDimension());
-  cout << "Total Solution is: " << numSteps << " x ";
-  cout << currentSolution -> GetDimension() << endl;
+    // Allocate the TotalSolution Array.
+    cout << "maxStep/stepSize: " << maxStep/stepSize << endl;
+    long numSteps = maxStep/stepSize;
+    TotalSolution.SetSize(numSteps+1, currentSolution -> GetDimension());
+    cout << "Total Solution is: " << numSteps << " x ";
+    cout << currentSolution -> GetDimension() << endl;
 
-  cvOneDString String1( "step_");
-  char String2[] = "99999";
-  cvOneDString title;
+    previousSolution->Rename( "step_0");
+    *currentSolution = *previousSolution;
 
-  previousSolution->Rename( "step_0");
-  *currentSolution = *previousSolution;
+    double* tmp = previousSolution -> GetEntries();
+    int j;
+    for (j=0;j<previousSolution -> GetDimension(); j++){
+        TotalSolution[0][j] = tmp[j];
+    }
 
-  double* tmp = previousSolution -> GetEntries();
-  int j;
-  for (j=0;j<previousSolution -> GetDimension(); j++){
-    TotalSolution[0][j] = tmp[j];
-  }
-
-  // Initialize the Equations...
-  int numMath = mathModels.size();
-  for(i = 0; i < numMath; i++){
-    mathModels[i]->EquationInitialize(previousSolution, currentSolution);
-  }
-
-  double cycleTime = mathModels[0]->GetCycleTime();
-
-  // Global Solution Loop
-  long q=1;
-  double checkMass = 0;
-  int numberOfCycle = 1;
-  long iter_total = 0;
-
-  // Time stepping
-  for(long step = 1; step <= maxStep; step++){
-    increment->Clear();
+    // Initialize the Equations...
+    int numMath = mathModels.size();
     for(i = 0; i < numMath; i++){
-      mathModels[i]->TimeUpdate(currentTime, deltaTime);
+        mathModels[i]->EquationInitialize(previousSolution, currentSolution);
     }
 
-    // Newton-Raphson Iterations...
-    int iter = 0;
-    double normf = 1.0;
-    double norms = 1.0;
+    double cycleTime = mathModels[0]->GetCycleTime();
 
-    if(fmod(currentTime, cycleTime) <5.0E-6 || -(fmod(currentTime,cycleTime)-cycleTime)<5.0E-6) {
-      checkMass = 0;
-      cout << "**** Time cycle " << numberOfCycle++ << endl;
-    }
-    currentTime += deltaTime;
 
-    while(true){
-      tstart_iter=clock();
+}
 
-      for(i = 0; i < numMath; i++){
+bool cvOneDBFSolver::Do_Newton_Step(int *iter){
+
+
+    static double normf ;
+    static double norms ;
+
+    // initialize times
+    clock_t tstart_iter;
+    clock_t tstart_solve;
+    clock_t tend_iter;
+    clock_t tend_solve;
+
+    tstart_iter=clock();
+
+    int numMath = mathModels.size();
+    long int i=0;
+
+    for(i = 0; i < numMath; i++){
         mathModels[i]->FormNewton(lhs, rhs);
-      }
+    }
 
-      // PRINT RHS BEFORE BC APP
-      if(cvOneDGlobal::debugMode){
+    // PRINT RHS BEFORE BC APP
+    if(cvOneDGlobal::debugMode){
         printf("(Debug) Printing LHS and RHS...\n");
         ofstream ofsRHS;
         ofstream ofsLHS;
@@ -1444,154 +1428,210 @@ void cvOneDBFSolver::GenerateSolution(void){
         ofsLHS.close();
         printf("ECCOLO\n");
         getchar();
-      }
+    }
 
-      mathModels[0]->ApplyBoundaryConditions();
-        cout<<" --- RHS: After Application of BC " << endl;
-      // PRINT RHS AFTER BC APP
-      if(cvOneDGlobal::debugMode){
+    mathModels[0]->ApplyBoundaryConditions();
+    // PRINT RHS AFTER BC APP
+    if(cvOneDGlobal::debugMode){
         cout<<" --- RHS: After Application of BC " << endl;
         rhs->print(cout);
-      }
+    }
 
-      // Do not evaluate residuals of lagrange eqns
-      if(jointList.size() != 0){
+    // Do not evaluate residuals of lagrange eqns
+    if(jointList.size() != 0){
         normf = rhs->Norm(L2_norm,1,2, jointList[0]->GetGlobal1stLagNodeID());
         norms = rhs->Norm(L2_norm,0,2, jointList[0]->GetGlobal1stLagNodeID());
-      }else{
+    }else{
         normf = rhs->Norm(L2_norm,1,2);
         norms = rhs->Norm(L2_norm,0,2);
-      }
+    }
 
-      if (std::isnan(norms) || std::isnan(normf)) {
-          throw cvException("Calculated a NaN for the residual.");
-      }
+    if (std::isnan(norms) || std::isnan(normf)) {
+        throw cvException("Calculated a NaN for the residual.");
+    }
 
-      // Check Newton-Raphson Convergence
-      if((currentTime != deltaTime || (currentTime == deltaTime && iter != 0)) && normf < convCriteria && norms < convCriteria){
-        cout << "    iter: " << std::to_string(iter) << " ";
+    // Check Newton-Raphson Convergence
+    if((currentTime != deltaTime || (currentTime == deltaTime && *iter != 0)) && normf < convCriteria && norms < convCriteria){
+        cout << "    iter: " << std::to_string(*iter) << " ";
         cout << "normf: " << normf << " ";
         cout << "norms: " << norms << " ";
         cout << "time: " << ((float)(tend_iter-tstart_iter))/CLOCKS_PER_SEC << endl;
-        break;
-      }
+        return false ;
+    }
 
-      // Add increment
-      increment->Clear();
-        cout<<" --- Start solving " << endl;
-      cvOneDGlobal::solver->Solve(*increment);
-        cout<<" --- Done solving " << endl;
-      currentSolution->Add(*increment);
+    // Add increment
+    increment->Clear();
+    cvOneDGlobal::solver->Solve(*increment);
+    currentSolution->Add(*increment);
 
-      // If the area goes less than zero, it tells in which segment the error occurs.
-      // Assumes that all the lagrange multipliers are at the end of the vector.
-      int negArea=0;
-      if(jointList.size() != 0){
+    // If the area goes less than zero, it tells in which segment the error occurs.
+    // Assumes that all the lagrange multipliers are at the end of the vector.
+    int negArea=0;
+    if(jointList.size() != 0){
         for (long i= 0; i< jointList[0]->GetGlobal1stLagNodeID();i+=2){
-          long elCount = 0;
-          int fileIter = 0;
-          //check if area <0 or =nan
-          if (currentSolution->Get(i) < 0.0 || (currentSolution->Get(i) != currentSolution->Get(i))){
-           negArea=1;
-            while (fileIter < model -> getNumberOfSegments()){
-              cvOneDSegment *curSeg = model -> getSegment(fileIter);
-              long numEls = curSeg -> getNumElements();
-              long startOut = elCount;
-              long finishOut = elCount + ((numEls+1)*2);
-              char *modelname;
-              char *segname;
-              if (startOut <= i && i <= finishOut) {
-                 modelname = model-> getModelName();
-                 segname = curSeg -> getSegmentName();
-                 std::string msg = "ERROR: The area of segment '" + std::string(segname) + "' is negative.";
-                 throw cvException(msg.c_str());
-              }
-              elCount += 2*(numEls+1);
-              fileIter++;
-             }
-           }
-         }
+            long elCount = 0;
+            int fileIter = 0;
+            //check if area <0 or =nan
+            if (currentSolution->Get(i) < 0.0 || (currentSolution->Get(i) != currentSolution->Get(i))){
+                negArea=1;
+                while (fileIter < model -> getNumberOfSegments()){
+                    cvOneDSegment *curSeg = model -> getSegment(fileIter);
+                    long numEls = curSeg -> getNumElements();
+                    long startOut = elCount;
+                    long finishOut = elCount + ((numEls+1)*2);
+                    char *modelname;
+                    char *segname;
+                    if (startOut <= i && i <= finishOut) {
+                        modelname = model-> getModelName();
+                        segname = curSeg -> getSegmentName();
+                        std::string msg = "ERROR: The area of segment '" + std::string(segname) + "' is negative.";
+                        throw cvException(msg.c_str());
+                    }
+                    elCount += 2*(numEls+1);
+                    fileIter++;
+                }
+            }
         }
+    }
 
-        if(negArea==1) {
+    if(negArea==1) {
         postprocess_Text();
         assert(0);
-        }
+    }
 
-      if(cvOneDGlobal::debugMode){
+    if(cvOneDGlobal::debugMode){
         printf("(Debug) Printing Solution...\n");
         ofstream ofs("solution.txt");
         for(int loopA=0;loopA<currentSolution->GetDimension();loopA++){
-          ofs << to_string(loopA) << " " << currentSolution->Get(i) << endl;
+            ofs << to_string(loopA) << " " << currentSolution->Get(i) << endl;
         }
         ofs.close();
         getchar();
-      }
+    }
 
 
-      // A flag in case the cross sectional area is negative, but don't want to include the lagrange multipliers
-      // Assumes that all the lagrange multipliers are at the end of the vector
-      if(jointList.size() != 0){
+    // A flag in case the cross sectional area is negative, but don't want to include the lagrange multipliers
+    // Assumes that all the lagrange multipliers are at the end of the vector
+    if(jointList.size() != 0){
         currentSolution->CheckPositive(0,2,jointList[0]->GetGlobal1stLagNodeID());
-      }else{
+    }else{
         currentSolution->CheckPositive(0,2,currentSolution->GetDimension());
-      }
+    }
 
-      // Set Boundary Conditions
-      mathModels[0]->SetBoundaryConditions();
-      tend_iter=clock();
+    // Set Boundary Conditions
+    mathModels[0]->SetBoundaryConditions();
+    tend_iter=clock();
 
-      cout << "    iter: " << std::to_string(iter) << " ";
-      cout << "normf: " << normf << " ";
-      cout << "norms: " << norms << " ";
-      cout << "time: " << ((float)(tend_iter-tstart_iter))/CLOCKS_PER_SEC << endl;
+    cout << "    iter: " << std::to_string(*iter) << " ";
+    cout << "normf: " << normf << " ";
+    cout << "norms: " << norms << " ";
+    cout << "time: " << ((float)(tend_iter-tstart_iter))/CLOCKS_PER_SEC << endl;
 
 
-      if(iter > MAX_NONLINEAR_ITERATIONS){
+    if(*iter > MAX_NONLINEAR_ITERATIONS){
         cout << "Error: Newton not converged, exceed max iterations" << endl;
         cout << "norm of Flow rate:" << normf << ", norm of Area:" << norms << endl;
-          //throw "NEwton";
-        break;
-      }
 
-
-
-      double new_flow=synchronizer->Get_3d_q_at_t(currentTime);
-
-      // the inlet condition is set per default on the first position
-      long eqNumbers[2];
-      mathModels[0]->GetNodalEquationNumbers( 0, eqNumbers, 0);
-      synchronizer->Set_1D_p_at_t(currentTime,0);
-      mathModels[0]->UpdateInflowRate(new_flow,step);
-      // we use this assumption to extract the area and calculate the pressure:
-      cvOneDMaterial* curMat = subdomainList[0]->GetMaterial();
-      double area=currentSolution-> GetEntries()[eqNumbers[0]];
-      synchronizer->Set_1D_p_at_t(currentTime,curMat->GetPressure(area,0));
-    // Increment Iteration Number
-    iter++;
-
-  }// End while
-
-  checkMass += mathModels[0]->CheckMassBalance() * deltaTime;
-  cout << "  Time = " << currentTime << ", ";
-  cout << "Mass = " << checkMass << ", ";
-  cout << "Tot iters = " << std::to_string(iter) << endl;
-
-  // Save solution if needed
-  if(step % stepSize == 0){
-    sprintf( String2, "%ld", (unsigned long)step);
-    title = String1 + String2;
-    currentSolution->Rename(title.data());
-
-    double * tmp = currentSolution -> GetEntries();
-    int j;
-
-    for(j=0;j<currentSolution -> GetDimension(); j++){
-      TotalSolution[q][j] = tmp[j];
+        return false ;
     }
-    q++;
-  }
-  *previousSolution = *currentSolution;
+
+    // Increment Iteration Number
+    (*iter)++;
+
+    // Indicate that newton iteration was successfull
+    return true;
+
+}
+
+void cvOneDBFSolver::UpdateTimeStep(void){
+    *previousSolution = *currentSolution;
+    increment->Clear();
+    for(int i = 0; i < mathModels.size(); i++){
+        mathModels[i]->TimeUpdate(currentTime, deltaTime);
+    }
+
+    /* idk what that did do:
+     * int numberOfCycle = 1;
+     * double cycleTime = mathModels[0]->GetCycleTime();
+    if(fmod(currentTime, cycleTime) <5.0E-6 || -(fmod(currentTime,cycleTime)-cycleTime)<5.0E-6) {
+       // checkMass = 0;
+        cout << "**** Time cycle " << numberOfCycle++ << endl;
+    }*/
+
+    currentTime += deltaTime;
+
+}
+
+
+void cvOneDBFSolver::SynchronizeDataofStep(int step){
+
+
+    double new_flow=synchronizer->Get_3d_q_at_t(currentTime);
+    mathModels[0]->UpdateInflowRate(new_flow,step);
+
+    // extract inlet condition
+    long eqNumbers[2];
+    // inlet is set per default on the first position
+    mathModels[0]->GetNodalEquationNumbers( 0, eqNumbers, 0);
+    // extract the area
+    cvOneDMaterial* curMat = subdomainList[0]->GetMaterial();
+    double area=currentSolution-> GetEntries()[eqNumbers[0]];
+    // calculate the pressure with the material
+    synchronizer->Set_1D_p_at_t(currentTime,curMat->GetPressure(area,0));
+    //cout <<"Time: "<<currentTime<<" " <<"pressure: " <<curMat->GetPressure(area,0) << endl;
+
+}
+
+void cvOneDBFSolver::UpdateSolution(int iter ,int step) {
+    char String2[] = "99999";
+
+    cvOneDString String1( "step_");
+    cvOneDString title;
+
+    checkMass += mathModels[0]->CheckMassBalance() * deltaTime;
+    cout << "  Time = " << currentTime << ", ";
+    cout << "Mass = " << checkMass << ", ";
+    cout << "Tot iters = " << std::to_string(iter) << endl;
+
+    // Save solution if needed
+    if(step % stepSize == 0){
+        sprintf( String2, "%ld", (unsigned long)step);
+        title = String1 + String2;
+        currentSolution->Rename(title.data());
+
+        double * tmp = currentSolution -> GetEntries();
+        int j;
+
+        for(j=0;j<currentSolution -> GetDimension(); j++){
+            TotalSolution[q][j] = tmp[j];
+        }
+        q++;
+    }
+}
+
+// =================
+// GENERATE SOLUTION
+// =================
+void cvOneDBFSolver::GenerateSolution(void){
+
+    Initialize();
+    long iter_total = 0;
+
+  // Time stepping
+  for(long step = 1; step <= maxStep; step++){
+
+    UpdateTimeStep();
+    int iter = 0;
+    while(true){
+
+        // Newton-Raphson Iterations...
+        if(! Do_Newton_Step(&iter)){
+            break;
+        }
+        SynchronizeDataofStep(step);
+
+    }// End while
+    UpdateSolution(iter,step);
   iter_total += iter;
   } // End global loop
 

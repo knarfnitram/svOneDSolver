@@ -623,10 +623,6 @@ int cvOneDMthModelBase::Get_Pressure_Position(){
 
 void cvOneDMthModelBase::UpdateInflowRate(double flow,int i) {
 
-    //cout<<"Time and flow rate bevore update: " << time[i] << ", " << flrt[i] << endl;
-    //time[i] = t[i];
-    if(i > nFlowPts)    std::cout<<" you are exceeding the array size of nFlowPts"<<std::endl;
-
     //cout<<"Time and flow rate bevore after: " << time[i] << ", " << flrt[i] << endl;
     double correctedTime = currentTime - static_cast<long>(currentTime / cycleTime) * cycleTime;
     int ptr = 0;
