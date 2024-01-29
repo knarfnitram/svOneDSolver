@@ -1036,28 +1036,34 @@ void cvOneDBFSolver::Solve(void){
   GenerateSolution();
 
   // Some Post Processing
-  if(cvOneDGlobal::outputType == OutputTypeScope::OUTPUT_TEXT){
-    postprocess_Text();
-  }else if(cvOneDGlobal::outputType == OutputTypeScope::OUTPUT_VTK){
-    if(cvOneDGlobal::vtkOutputType == 0){
-      // Export in multifile format
-      postprocess_VTK_XML3D_MULTIPLEFILES();
-    }else{
-      // All results in a single VTK File
-      postprocess_VTK_XML3D_ONEFILE();
-    }
-  }else if(cvOneDGlobal::outputType == OutputTypeScope::OUTPUT_BOTH){
-    postprocess_Text();
-    if(cvOneDGlobal::vtkOutputType == 0){
-      // Export in multifile format
-      postprocess_VTK_XML3D_MULTIPLEFILES();
-    }else{
-      // All results in a single VTK File
-      postprocess_VTK_XML3D_ONEFILE();
-    }
-  }
-}
+  DoPostProcessing();
 
+}
+void cvOneDBFSolver::DoPostProcessing(void){
+
+    if(cvOneDGlobal::outputType == OutputTypeScope::OUTPUT_TEXT){
+        postprocess_Text();
+    }else if(cvOneDGlobal::outputType == OutputTypeScope::OUTPUT_VTK){
+        if(cvOneDGlobal::vtkOutputType == 0){
+            // Export in multifile format
+            postprocess_VTK_XML3D_MULTIPLEFILES();
+        }else{
+            // All results in a single VTK File
+            postprocess_VTK_XML3D_ONEFILE();
+        }
+    }else if(cvOneDGlobal::outputType == OutputTypeScope::OUTPUT_BOTH){
+        postprocess_Text();
+        if(cvOneDGlobal::vtkOutputType == 0){
+            // Export in multifile format
+            postprocess_VTK_XML3D_MULTIPLEFILES();
+        }else{
+            // All results in a single VTK File
+            postprocess_VTK_XML3D_ONEFILE();
+        }
+    }
+
+
+}
 void cvOneDBFSolver::DefineInletFlow(double* time, double* flrt, int num){
   flowTime = new double[num];
   flowRate = new double[num];
@@ -1386,9 +1392,6 @@ void cvOneDBFSolver::Initialize(void){
     for(i = 0; i < numMath; i++){
         mathModels[i]->EquationInitialize(previousSolution, currentSolution);
     }
-
-    double cycleTime = mathModels[0]->GetCycleTime();
-
 
 }
 

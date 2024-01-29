@@ -94,6 +94,9 @@ class cvOneDBFSolver{
     // update the solution vector after time step and print newton iteration
     static void UpdateSolution(int iter ,int step);
 
+    // call Postprocessing routines
+    static void void DoPostProcessing(void );
+
     // Get the solution;
     static double GetSolution(int i, int j){return TotalSolution[i][j];}//IV 082103
 
