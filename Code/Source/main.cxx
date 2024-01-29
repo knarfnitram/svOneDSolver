@@ -1,11 +1,11 @@
-#include "OneDSolverv2.h"
+#include "OneDSolverInterface.h"
 
 // ==============
 // RUN ONEDSOLVER
 // ==============
 void runOneDSolver(string inputFile){
 
-    OneDSolverv2 myOneDSolver=OneDSolverv2();
+    OneDSolverInterface myOneDSolver=OneDSolverInterface();
     // Create Options
     cvOneDOptions* opts = new cvOneDOptions();
 

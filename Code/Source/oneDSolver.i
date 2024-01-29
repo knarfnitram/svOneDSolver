@@ -3,7 +3,7 @@
  %{
  /* Includes the header in the wrapper code */
  #include "cvOneDOptions.h"
- #include "OneDSolverv2.h"
+ #include "OneDSolverInterface.h"
 
 using namespace std;
  %}
