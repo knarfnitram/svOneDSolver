@@ -95,7 +95,7 @@ class cvOneDBFSolver{
     static void UpdateSolution(int iter ,int step);
 
     // call Postprocessing routines
-    static void void DoPostProcessing(void );
+    static void DoPostProcessing(void);
 
     // Get the solution;
     static double GetSolution(int i, int j){return TotalSolution[i][j];}//IV 082103

@@ -83,7 +83,8 @@ class cvOneDModelManager{
     int SolveCoupledModel(double dt, long stepSize,
                               long maxStep, long quadPoints,
                               int len, char* boundType, double* values,
-                              double* times, double conv, int useIV, int usestab,cvOneDSynchronizer sync);
+                              double* times, double conv, int useIV, int usestab,
+                              cvOneDSynchronizer sync);
 };
 
 #endif // CVONEDMODELMANAGER_H
