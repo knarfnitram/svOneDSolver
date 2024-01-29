@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "OneDSolverv2.h"
+#include "OneDSolverInterface.h"
 #include <string.h>
 
 using namespace std;
@@ -39,7 +39,7 @@ using namespace std;
 // ====================================
 // GET DATA TABLE ENTRY FROM STRING KEY
 // ====================================
-int OneDSolverv2::getDataTableIDFromStringKey(string key){
+int OneDSolverInterface::getDataTableIDFromStringKey(string key){
     std::cout<<"This is the key: "<<key<<std::endl;
   bool found = false;
   int count = 0;
@@ -61,7 +61,7 @@ int OneDSolverv2::getDataTableIDFromStringKey(string key){
 // ===============================
 // CREATE MODEL AND RUN SIMULATION
 // ===============================
-cvOneDModelManager* OneDSolverv2::setupModelManager(cvOneDOptions* opts){
+cvOneDModelManager* OneDSolverInterface::setupModelManager(cvOneDOptions* opts){
     // MESSAGE
     printf("\n");
     printf("Creating and Running Model ...\n");
@@ -255,7 +255,7 @@ cvOneDModelManager* OneDSolverv2::setupModelManager(cvOneDOptions* opts){
 
     return oned;
 }
-void OneDSolverv2::createAndRunModel(cvOneDOptions* opts,cvOneDSynchronizer synch){
+void OneDSolverInterface::createAndRunModel(cvOneDOptions* opts, cvOneDSynchronizer synch){
 
    auto oned= setupModelManager(opts);
     double* vals;
@@ -298,7 +298,7 @@ void OneDSolverv2::createAndRunModel(cvOneDOptions* opts,cvOneDSynchronizer sync
 // ======================
 // READ SINGLE MODEL FILE
 // ======================
-void OneDSolverv2::readModelFile(string inputFile, cvOneDOptions* opts, cvStringVec includedFiles){
+void OneDSolverInterface::readModelFile(string inputFile, cvOneDOptions* opts, cvStringVec includedFiles){
 
   // Message
   printf("\n");
@@ -638,7 +638,7 @@ void OneDSolverv2::readModelFile(string inputFile, cvOneDOptions* opts, cvString
 // ====================
 // READ MODEL FROM FILE
 // ====================
-void OneDSolverv2::readModel(string inputFile, cvOneDOptions* opts){
+void OneDSolverInterface::readModel(string inputFile, cvOneDOptions* opts){
 
   // List of included Files
   cvStringVec includedFiles;

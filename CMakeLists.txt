@@ -16,7 +16,7 @@ SET_PROPERTY(CACHE sparseSolverType PROPERTY STRINGS skyline superlu csparse)
 IF(sparseSolverType STREQUAL "skyline")
   ADD_DEFINITIONS("-DUSE_SKYLINE")
 ENDIF()
-IF(sparseSolverType STREQUAL "superlu")  
+IF(sparseSolverType STREQUAL "superlu")
   ADD_DEFINITIONS("-DUSE_SUPERLU")
 ENDIF()
 IF(sparseSolverType STREQUAL "csparse")
@@ -120,11 +120,12 @@ target_link_libraries(OneDSolver_lib INTERFACE OneDSolver_core)
 target_include_directories(OneDSolver_lib INTERFACE )
 target_include_directories(OneDSolver_lib INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Code/Source>
-        $<INSTALL_INTERFACE:include/onedsolver/>
+        $<INSTALL_INTERFACE:include/onedsolver>
 )
 
-add_executable(OneDSolverv2 Code/Source/main.cxx)
-target_link_libraries(OneDSolverv2 PUBLIC OneDSolver_lib)
+add_executable(OneDSolverInterface Code/Source/OneDSolverInterface.h)
+target_link_libraries(OneDSolverInterface PUBLIC OneDSolver_lib)
+
 install(TARGETS OneDSolver_lib OneDSolver_core
         EXPORT OneDSolver_libTargets
         ARCHIVE LIBRARY PUBLIC_HEADER
@@ -145,5 +146,7 @@ install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/onedsolver_libConfig.cmake
         DESTINATION lib/cmake/onedsolver
 )
+set(version 1.0)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/Code/Source/ DESTINATION include/onedsolver FILES_MATCHING PATTERN "*.h*")
 
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/src/ DESTINATION include/onedsolver FILES_MATCHING PATTERN "*.h*")
+export(PACKAGE OneDSolver_lib)

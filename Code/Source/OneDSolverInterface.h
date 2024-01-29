@@ -45,12 +45,14 @@ using namespace std;
 //void WriteHeader();
 //void runOneDSolver(string inputFile);
 
-class OneDSolverv2 {
+class OneDSolverInterface {
 public:
 
 
 
     int getDataTableIDFromStringKey(string key);
+
+    cvOneDModelManager* setupModelManager(cvOneDOptions* opts);
 
     void createAndRunModel(cvOneDOptions *opts, cvOneDSynchronizer synch);
 
