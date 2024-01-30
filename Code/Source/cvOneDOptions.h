@@ -32,12 +32,18 @@
 #ifndef CVONEDOPTIONS_H
 #define CVONEDOPTIONS_H
 
+
+
 # include <string>
 # include <math.h>
 # include "cvOneDTypes.h"
 # include "cvOneDException.h"
 
-using namespace std;
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+    using namespace std;
 
 class cvOneDOptions{
   public:
@@ -139,5 +145,10 @@ class cvOneDOptions{
     void checkJointHasNodes();
 };
 
-#endif // CVONEDOPTIONS_H
 
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // CVONEDOPTIONS_H

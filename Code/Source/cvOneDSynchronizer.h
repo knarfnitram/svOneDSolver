@@ -4,8 +4,11 @@
 #ifndef CVONEDSYNCHRONIZER_H
 #define CVONEDSYNCHRONIZER_H
 
-using namespace std;
 
+using namespace std;
+#ifdef __cplusplus
+extern "C" {
+#endif
 // This is the data container to exchange the data between the two simulation models
 
 
@@ -49,6 +52,9 @@ public:
 
     int calculate_step(double time);
 };
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CVONEDSYNCHRONIZER_H
+
