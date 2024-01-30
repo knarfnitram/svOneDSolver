@@ -1001,36 +1001,43 @@ void cvOneDBFSolver::postprocess_VTK_XML3D_MULTIPLEFILES(){
   printf("Results Exported to VTK.\n");
 }
 
+void cvOneDBFSolver::PreSolveInit(void){
+    char errStr[256];
+    // First check to make sure we've set a model pointer
+    // Prior to solution attempt.
+    if(model == NULL){
+        cvOneDError::setErrorNumber(ErrorTypeScope::BAD_VALUE);
+        strcpy(errStr,"In BFSolver::Solve(...), No model pointer was set prior to solution attempt.  Bailing out to avoid a coredump!");
+        cvOneDError::setErrorString(errStr);
+        cvOneDError::CallErrorHandler();
+        exit(0);
+    }
+
+    // Query the model for information, this is where
+    // the subdomain and material information get passed.
+    QuerryModelInformation();
+
+    DefineMthModels();
+
+    CreateGlobalArrays();
+
+    long id;
+    id = model -> getNumberOfSegments();
+
+    int i;
+    for (i=0; i<id; i++){
+        CalcInitProps(i);
+    }
+
+}
+
 // ====================
 // MAIN SOLUTION DRIVER
 // ====================
 void cvOneDBFSolver::Solve(void){
-  char errStr[256];
-  // First check to make sure we've set a model pointer
-  // Prior to solution attempt.
-  if(model == NULL){
-    cvOneDError::setErrorNumber(ErrorTypeScope::BAD_VALUE);
-    strcpy(errStr,"In BFSolver::Solve(...), No model pointer was set prior to solution attempt.  Bailing out to avoid a coredump!");
-    cvOneDError::setErrorString(errStr);
-    cvOneDError::CallErrorHandler();
-    exit(0);
-  }
 
-  // Query the model for information, this is where
-  // the subdomain and material information get passed.
-  QuerryModelInformation();
-
-  DefineMthModels();
-
-  CreateGlobalArrays();
-
-  long id;
-  id = model -> getNumberOfSegments();
-
-  int i;
-  for (i=0; i<id; i++){
-    CalcInitProps(i);
-  }
+    // Initialize the solver
+    PreSolveInit();
 
   // Start Solving the system.
   GenerateSolution();

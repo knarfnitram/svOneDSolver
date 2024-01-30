@@ -85,6 +85,9 @@ class cvOneDBFSolver{
     // perform one newton iteration
     static bool Do_Newton_Step(int *iter);
 
+    // initialize variables before newton solver
+    static void PreSolveInit(void);
+
     // update the time_step variables
     static void UpdateTimeStep(void);
 
