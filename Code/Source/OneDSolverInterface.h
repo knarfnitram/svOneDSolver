@@ -28,6 +28,8 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef ONEDSOLVERIINTERFACE_H
+#define ONEDSOLVERIINTERFACE_H
 
 # include <string.h>
 # include <iostream>
@@ -41,27 +43,34 @@
 # include "cvOneDException.h"
 # include "cvOneDSynchronizer.h"
 
-using namespace std;
+    using namespace std;
 //void WriteHeader();
 //void runOneDSolver(string inputFile);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-class OneDSolverInterface {
-public:
+    class OneDSolverInterface {
+    public:
+        OneDSolverInterface();
+        ~OneDSolverInterface();
+
+        int getDataTableIDFromStringKey(string key);
+
+        cvOneDModelManager *setupModelManager(cvOneDOptions *opts);
+
+        void createAndRunModel(cvOneDOptions *opts, cvOneDSynchronizer synch);
+        void createAndRunModel(cvOneDOptions *opts);
+
+        void readModelFile(string inputFile, cvOneDOptions *opts, cvStringVec includedFiles);
+
+        void readModel(string inputFile, cvOneDOptions *opts);
+
+        void SetupCoupling();
 
 
-
-    int getDataTableIDFromStringKey(string key);
-
-    cvOneDModelManager* setupModelManager(cvOneDOptions* opts);
-
-    void createAndRunModel(cvOneDOptions *opts, cvOneDSynchronizer synch);
-
-    void readModelFile(string inputFile, cvOneDOptions *opts, cvStringVec includedFiles);
-
-    void readModel(string inputFile, cvOneDOptions *opts);
-
-    void SetupCoupling();
-
-
-
-};
+    };
+#ifdef __cplusplus
+}
+#endif
+#endif
