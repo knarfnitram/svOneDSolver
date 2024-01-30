@@ -1,5 +1,5 @@
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.00)
 
 # COMMON SETTINGS
 PROJECT(OneDSolver)
@@ -74,7 +74,7 @@ ENDIF()
 # FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/tests" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
 # COMPILER FLAGS
-SET(CMAKE_CXX_FLAGS "-g -m64 -O3 -std=c++0x -fPIC")
+SET(CMAKE_CXX_FLAGS "-g -m64 -O3 -fPIC")
 
 # PLACE EXECUTABLE IN BIN FOLDER
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -118,13 +118,18 @@ add_library(OneDSolver_core
 add_library(OneDSolver_lib INTERFACE)
 target_link_libraries(OneDSolver_lib INTERFACE OneDSolver_core)
 target_include_directories(OneDSolver_lib INTERFACE )
+
+#set(CMAKE_INSTALL_DIR "/home/a11bmafr/software/SimVascular/install" CACHE PATH "..." FORCE)
+
+
+message( ${CMAKE_BINARY_DIR})
 target_include_directories(OneDSolver_lib INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Code/Source>
         $<INSTALL_INTERFACE:include/onedsolver>
 )
-
-add_executable(OneDSolverInterface Code/Source/OneDSolverInterface.h)
-target_link_libraries(OneDSolverInterface PUBLIC OneDSolver_lib)
+add_library(onedsolver::OneDSolver_lib ALIAS OneDSolver_lib)
+add_executable(exe Code/Source/main.cxx)
+target_link_libraries(exe PUBLIC OneDSolver_core)
 
 install(TARGETS OneDSolver_lib OneDSolver_core
         EXPORT OneDSolver_libTargets
@@ -133,20 +138,20 @@ install(TARGETS OneDSolver_lib OneDSolver_core
 
 install(EXPORT OneDSolver_libTargets
         NAMESPACE OneDSolver::
-        DESTINATION lib/cmake/onedsolver
+        DESTINATION ${CMAKE_INSTALL_DIR}/lib/cmake/onedsolver
 )
 
 include(CMakePackageConfigHelpers)
 configure_package_config_file(cmake/onedsolver_libConfig.cmake.in
         ${CMAKE_CURRENT_BINARY_DIR}/onedsolver_libConfig.cmake
-        INSTALL_DESTINATION lib/cmake/onedsolver
+        INSTALL_DESTINATION ${CMAKE_INSTALL_DIR}/lib/cmake/onedsolver
 )
 
 install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/onedsolver_libConfig.cmake
-        DESTINATION lib/cmake/onedsolver
+        DESTINATION ${CMAKE_INSTALL_DIR}/lib/cmake/onedsolver
 )
 set(version 1.0)
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/Code/Source/ DESTINATION include/onedsolver FILES_MATCHING PATTERN "*.h*")
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/Code/Source/ DESTINATION ${CMAKE_INSTALL_DIR}/include/onedsolver FILES_MATCHING PATTERN "*.h*")
 
 export(PACKAGE OneDSolver_lib)
