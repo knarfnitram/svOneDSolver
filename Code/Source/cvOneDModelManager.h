@@ -85,6 +85,8 @@ class cvOneDModelManager{
                               int len, char* boundType, double* values,
                               double* times, double conv, int useIV, int usestab,
                               cvOneDSynchronizer sync);
+
+    int ConvertandCheckBound(BoundCondTypeScope::BoundCondType *boundT,char* boundType);
 };
 
 #endif // CVONEDMODELMANAGER_H

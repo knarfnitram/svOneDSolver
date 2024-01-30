@@ -217,47 +217,51 @@ int cvOneDModelManager::CreateJoint(char * jointName,double x,double y,double z,
 
   return CV_OK;
 }
+int cvOneDModelManager::ConvertandCheckBound(BoundCondTypeScope::BoundCondType *boundT,char *boundType){
+    // convert char string to boundary condition type
+    if(!strcmp( boundType, "NOBOUND")){
+        *boundT = BoundCondTypeScope::NOBOUND;
+        printf("Inlet Condition Type: NOBOUND\n");
+    }else if(!strcmp( boundType, "PRESSURE")){
+        *boundT = BoundCondTypeScope::PRESSURE;
+        printf("Inlet Condition Type: PRESSURE\n");
+    }else if(!strcmp( boundType, "PRESSURE_WAVE")){
+        *boundT = BoundCondTypeScope::PRESSURE_WAVE;
+        printf("Inlet Condition Type: PRESSURE_WAVE\n");
+    }else if(!strcmp( boundType, "FLOW")){
+        *boundT = BoundCondTypeScope::FLOW;
+        printf("Inlet Condition Type: FLOW\n");
+    }else if(!strcmp( boundType, "COUPLING_3D_1D")){
+        *boundT = BoundCondTypeScope::COUPLING_3D_1D;
+        printf("Inlet Condition Type: COUPLING_3D_1D\n");
+    }else if(!strcmp( boundType, "RESISTANCE")){
+        *boundT = BoundCondTypeScope::RESISTANCE;
+        printf("Inlet Condition Type: RESISTANCE\n");
+    }else if(!strcmp( boundType, "RESISTANCE_TIME")){
+        *boundT = BoundCondTypeScope::RESISTANCE_TIME;
+        printf("Inlet Condition Type: RESISTANCE_TIME\n");
+    }else if(!strcmp( boundType, "RCR")){
+        *boundT = BoundCondTypeScope::RCR;
+        printf("Inlet Condition Type: RCR\n");
+    }else if(!strcmp( boundType, "CORONARY")){
+        *boundT = BoundCondTypeScope::CORONARY;
+        printf("Inlet Condition Type: CORONARY\n");
+    }else{
+        return CV_ERROR;
+    }
+    return 0;
+}
+
+
 int cvOneDModelManager::SolveCoupledModel(double dt, long stepSize,
                                    long maxStep, long quadPoints,
                                    int len, char* boundType, double* values,
                                    double* times, double conv, int useIV, int usestab, cvOneDSynchronizer sync){
 
-    BoundCondTypeScope::BoundCondType boundT;
-
     // set the creation flag to off.
     cvOneDGlobal::isCreating = false;
-
-    // convert char string to boundary condition type
-    if(!strcmp( boundType, "NOBOUND")){
-        boundT = BoundCondTypeScope::NOBOUND;
-        printf("Inlet Condition Type: NOBOUND\n");
-    }else if(!strcmp( boundType, "PRESSURE")){
-        boundT = BoundCondTypeScope::PRESSURE;
-        printf("Inlet Condition Type: PRESSURE\n");
-    }else if(!strcmp( boundType, "PRESSURE_WAVE")){
-        boundT = BoundCondTypeScope::PRESSURE_WAVE;
-        printf("Inlet Condition Type: PRESSURE_WAVE\n");
-    }else if(!strcmp( boundType, "FLOW")){
-        boundT = BoundCondTypeScope::FLOW;
-        printf("Inlet Condition Type: FLOW\n");
-    }else if(!strcmp( boundType, "COUPLING_3D_1D")){
-        boundT = BoundCondTypeScope::COUPLING_3D_1D;
-        printf("Inlet Condition Type: COUPLING_3D_1D\n");
-    }else if(!strcmp( boundType, "RESISTANCE")){
-        boundT = BoundCondTypeScope::RESISTANCE;
-        printf("Inlet Condition Type: RESISTANCE\n");
-    }else if(!strcmp( boundType, "RESISTANCE_TIME")){
-        boundT = BoundCondTypeScope::RESISTANCE_TIME;
-        printf("Inlet Condition Type: RESISTANCE_TIME\n");
-    }else if(!strcmp( boundType, "RCR")){
-        boundT = BoundCondTypeScope::RCR;
-        printf("Inlet Condition Type: RCR\n");
-    }else if(!strcmp( boundType, "CORONARY")){
-        boundT = BoundCondTypeScope::CORONARY;
-        printf("Inlet Condition Type: CORONARY\n");
-    }else{
-        return CV_ERROR;
-    }
+    BoundCondTypeScope::BoundCondType boundT;
+    ConvertandCheckBound(&boundT,boundType);
 
     // Set Solver Options
     cvOneDMthSegmentModel::STABILIZATION = usestab; // 1=stabilization, 0=none
@@ -293,41 +297,12 @@ int cvOneDModelManager::SolveModel(double dt, long stepSize,
                                    double* times, double conv, int useIV, int usestab){
 
   BoundCondTypeScope::BoundCondType boundT;
+  if(CV_ERROR==ConvertandCheckBound(&boundT,boundType)){
+      return CV_ERROR;
+  }
 
   // set the creation flag to off.
   cvOneDGlobal::isCreating = false;
-
-  // convert char string to boundary condition type
-  if(!strcmp( boundType, "NOBOUND")){
-    boundT = BoundCondTypeScope::NOBOUND;
-    printf("Inlet Condition Type: NOBOUND\n");
-  }else if(!strcmp( boundType, "PRESSURE")){
-    boundT = BoundCondTypeScope::PRESSURE;
-    printf("Inlet Condition Type: PRESSURE\n");
-  }else if(!strcmp( boundType, "PRESSURE_WAVE")){
-    boundT = BoundCondTypeScope::PRESSURE_WAVE;
-    printf("Inlet Condition Type: PRESSURE_WAVE\n");
-  }else if(!strcmp( boundType, "FLOW")){
-    boundT = BoundCondTypeScope::FLOW;
-    printf("Inlet Condition Type: FLOW\n");
-  }else if(!strcmp( boundType, "COUPLING_3D_1D")){
-      boundT = BoundCondTypeScope::COUPLING_3D_1D;
-      printf("Inlet Condition Type: COUPLING_3D_1D\n");
-  }else if(!strcmp( boundType, "RESISTANCE")){
-    boundT = BoundCondTypeScope::RESISTANCE;
-    printf("Inlet Condition Type: RESISTANCE\n");
-  }else if(!strcmp( boundType, "RESISTANCE_TIME")){
-    boundT = BoundCondTypeScope::RESISTANCE_TIME;
-    printf("Inlet Condition Type: RESISTANCE_TIME\n");
-  }else if(!strcmp( boundType, "RCR")){
-    boundT = BoundCondTypeScope::RCR;
-    printf("Inlet Condition Type: RCR\n");
-  }else if(!strcmp( boundType, "CORONARY")){
-    boundT = BoundCondTypeScope::CORONARY;
-    printf("Inlet Condition Type: CORONARY\n");
-  }else{
-    return CV_ERROR;
-  }
 
   // Set Solver Options
   cvOneDMthSegmentModel::STABILIZATION = usestab; // 1=stabilization, 0=none
