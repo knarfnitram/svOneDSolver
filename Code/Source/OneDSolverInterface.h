@@ -59,7 +59,7 @@ extern "C" {
 
         cvOneDModelManager *setupModelManager(cvOneDOptions *opts);
 
-        void createAndRunModel(cvOneDOptions *opts, cvOneDSynchronizer synch);
+        void createAndRunModel(cvOneDOptions *opts, cvOneDSynchronizer *synch);
         void createAndRunModel(cvOneDOptions *opts);
 
         void readModelFile(string inputFile, cvOneDOptions *opts, cvStringVec includedFiles);

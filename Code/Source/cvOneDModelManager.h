@@ -84,7 +84,7 @@ class cvOneDModelManager{
                               long maxStep, long quadPoints,
                               int len, char* boundType, double* values,
                               double* times, double conv, int useIV, int usestab,
-                              cvOneDSynchronizer sync);
+                              cvOneDSynchronizer* sync);
 
     int ConvertandCheckBound(BoundCondTypeScope::BoundCondType *boundT,char* boundType);
 };

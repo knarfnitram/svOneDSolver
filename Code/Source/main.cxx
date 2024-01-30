@@ -20,7 +20,7 @@ void runOneDSolver(string inputFile){
     opts->printToFile(fileName);
 
     // Create Model and Run Simulation
-    //myOneDSolver.createAndRunModel();
+    myOneDSolver.createAndRunModel(opts);
 
     // Delete Options
     delete opts;

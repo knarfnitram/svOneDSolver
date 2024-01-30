@@ -256,7 +256,7 @@ int cvOneDModelManager::ConvertandCheckBound(BoundCondTypeScope::BoundCondType *
 int cvOneDModelManager::SolveCoupledModel(double dt, long stepSize,
                                    long maxStep, long quadPoints,
                                    int len, char* boundType, double* values,
-                                   double* times, double conv, int useIV, int usestab, cvOneDSynchronizer sync){
+                                   double* times, double conv, int useIV, int usestab, cvOneDSynchronizer* sync){
 
     // set the creation flag to off.
     cvOneDGlobal::isCreating = false;

@@ -73,8 +73,8 @@ class cvOneDBFSolver{
     static cvOneDModel* GetModelPtr(){return model;}
 
     // Set Synchronizer
-    static void SetSynchronizerPtr(cvOneDSynchronizer sync){
-        synchronizer = &sync;
+    static void SetSynchronizerPtr(cvOneDSynchronizer *sync){
+        synchronizer = sync;
     };
     // initialize
     static void Initialize(void);

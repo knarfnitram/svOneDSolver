@@ -6,12 +6,11 @@
 #include "cvOneDSynchronizer.h"
 
 
-//cvOneDSynchronizer::cvOneDSynchronizer() {
+cvOneDSynchronizer::cvOneDSynchronizer() {
 
+}
 
-
-//}
-
+// empty and Uniinitialized object
 cvOneDSynchronizer::~cvOneDSynchronizer(){
 
 }
@@ -29,13 +28,12 @@ cvOneDSynchronizer::cvOneDSynchronizer(int time_steps, double dt_){
 
 int cvOneDSynchronizer::calculate_step(double time){
 
-    if(dt <0.000000001){
+    if(dt <=0.0){
         std::cout<<"dt is bellow 0 than max_time_steps"<<std::endl;
         throw "currently the synchronizer does not support stepsizes bigger than:";
     }
 
     int step=int(time/dt);
-
 
     if(step > max_time_steps){
         std::cout<<"step is bigger than max_time_steps"<<std::endl;
@@ -43,6 +41,13 @@ int cvOneDSynchronizer::calculate_step(double time){
     }
     return step;
 
+}
+
+bool cvOneDSynchronizer::is_initialized(void){
+    if(max_time_steps>0 && dt>0){
+        return true;
+    }
+    return false;
 }
 
 double cvOneDSynchronizer::Get_3d_q_at_t(double t){

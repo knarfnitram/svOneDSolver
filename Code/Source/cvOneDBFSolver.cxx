@@ -1575,20 +1575,25 @@ void cvOneDBFSolver::UpdateTimeStep(void){
 
 void cvOneDBFSolver::SynchronizeDataofStep(int step){
 
+    // simply check if the synchronizer is set up,
+    // if not continue without updating the data
+    if(synchronizer->is_initialized()){
+        double new_flow=synchronizer->Get_3d_q_at_t(currentTime);
+        mathModels[0]->UpdateInflowRate(new_flow,step);
 
-    double new_flow=synchronizer->Get_3d_q_at_t(currentTime);
-    mathModels[0]->UpdateInflowRate(new_flow,step);
+        // extract inlet condition
+        long eqNumbers[2];
+        // inlet is set per default on the first position
+        mathModels[0]->GetNodalEquationNumbers( 0, eqNumbers, 0);
+        // extract the area
+        cvOneDMaterial* curMat = subdomainList[0]->GetMaterial();
+        double area=currentSolution-> GetEntries()[eqNumbers[0]];
+        // calculate the pressure with the material
+        synchronizer->Set_1D_p_at_t(currentTime,curMat->GetPressure(area,0));
+        //cout <<"Time: "<<currentTime<<" " <<"pressure: " <<curMat->GetPressure(area,0) << endl;
+    }
 
-    // extract inlet condition
-    long eqNumbers[2];
-    // inlet is set per default on the first position
-    mathModels[0]->GetNodalEquationNumbers( 0, eqNumbers, 0);
-    // extract the area
-    cvOneDMaterial* curMat = subdomainList[0]->GetMaterial();
-    double area=currentSolution-> GetEntries()[eqNumbers[0]];
-    // calculate the pressure with the material
-    synchronizer->Set_1D_p_at_t(currentTime,curMat->GetPressure(area,0));
-    //cout <<"Time: "<<currentTime<<" " <<"pressure: " <<curMat->GetPressure(area,0) << endl;
+
 
 }
 
@@ -1638,7 +1643,7 @@ void cvOneDBFSolver::GenerateSolution(void){
         if(! Do_Newton_Step(&iter)){
             break;
         }
-        SynchronizeDataofStep(step);
+    SynchronizeDataofStep(step);
 
     }// End while
     UpdateSolution(iter,step);

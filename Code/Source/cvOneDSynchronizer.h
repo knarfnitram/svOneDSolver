@@ -22,6 +22,7 @@ public:
 
     // Constructor
     cvOneDSynchronizer(int time_steps, double dt_);
+    cvOneDSynchronizer();
     ~cvOneDSynchronizer();
 
     // get the 3d averaged flow data at specific time point
@@ -36,7 +37,7 @@ public:
     // get the 1d pressure at time point
     double Get_1d_p_at_t(double t);
 
-
+    bool is_initialized();
 
     void Initialize(int time_steps, double dt_);
     private:

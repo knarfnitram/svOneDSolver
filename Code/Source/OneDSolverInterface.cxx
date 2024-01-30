@@ -30,6 +30,7 @@
  */
 
 #include "OneDSolverInterface.h"
+#include "cvOneDSynchronizer.h"
 #include <string.h>
 
 
@@ -259,45 +260,12 @@ cvOneDModelManager* OneDSolverInterface::setupModelManager(cvOneDOptions* opts){
     return oned;
 }
 void OneDSolverInterface::createAndRunModel(cvOneDOptions* opts){
-    auto oned= setupModelManager(opts);
-    double* vals;
-    int tot;
-
-    // SOLVE MODEL
-    printf("Solving Model ... \n");
-
-    string inletCurveName = opts->inletDataTableName;
-    int inletCurveIDX = getDataTableIDFromStringKey(inletCurveName);
-    int inletCurveTotals = cvOneDGlobal::gDataTables[inletCurveIDX]->getSize();
-    double* inletCurveTime = new double[inletCurveTotals];
-    double* inletCurveValue = new double[inletCurveTotals];
-    for(int loopB=0;loopB<inletCurveTotals;loopB++){
-        inletCurveTime[loopB] = cvOneDGlobal::gDataTables[inletCurveIDX]->getTime(loopB);
-        inletCurveValue[loopB] = cvOneDGlobal::gDataTables[inletCurveIDX]->getValues(loopB);
-    }
-    int solveError = CV_OK;
-    solveError = oned->SolveModel(opts->timeStep,
-                                         opts->stepSize,
-                                         opts->maxStep,
-                                         opts->quadPoints,
-                                         inletCurveTotals,
-                                         (char*)opts->boundaryType.c_str(),
-                                         inletCurveValue,
-                                         inletCurveTime,
-                                         opts->convergenceTolerance,
-            // Formulation Type
-                                         opts->useIV,
-            // Stabilization
-                                         opts->useStab);
-    if(solveError == CV_ERROR){
-        throw cvException(string("ERROR: Error Solving Model\n").c_str());
-    }
-    delete [] inletCurveTime;
-    delete [] inletCurveValue;
+    auto synch=new cvOneDSynchronizer();
+    createAndRunModel(opts, synch);
 
 }
 
-void OneDSolverInterface::createAndRunModel(cvOneDOptions* opts, cvOneDSynchronizer synch){
+void OneDSolverInterface::createAndRunModel(cvOneDOptions* opts, cvOneDSynchronizer* synch){
 
    auto oned= setupModelManager(opts);
     double* vals;
