@@ -22,6 +22,8 @@ public:
 
     // Constructor
     cvOneDSynchronizer(int time_steps, double dt_);
+
+    // uninitialized default Constructor
     cvOneDSynchronizer();
     ~cvOneDSynchronizer();
 
@@ -37,19 +39,25 @@ public:
     // get the 1d pressure at time point
     double Get_1d_p_at_t(double t);
 
+    // check if the object was set up correctly
     bool is_initialized();
 
     void Initialize(int time_steps, double dt_);
     private:
 
+    // maximum time steps
     int max_time_steps;
+
+    // time step size
     double dt;
 
-    // array which holds all data at specific time
+    // flow array
     double* q_1d;
-    double* p_1d;
     double* q_3d=NULL;
+
+    // pressure array
     double* p_3d;
+    double* p_1d;
 
     int calculate_step(double time);
 };
