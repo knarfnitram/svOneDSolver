@@ -7,7 +7,8 @@
 
 
 cvOneDSynchronizer::cvOneDSynchronizer() {
-
+    max_time_steps=0;
+    dt=0;
 }
 
 // empty and uinitialized object
