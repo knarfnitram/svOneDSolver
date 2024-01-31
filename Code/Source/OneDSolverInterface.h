@@ -57,7 +57,7 @@ extern "C" {
 
         int getDataTableIDFromStringKey(string key);
 
-        cvOneDModelManager *setupModelManager(cvOneDOptions *opts);
+        void  setupModelManager(cvOneDOptions *opts,cvOneDModelManager *oned );
 
         void createAndRunModel(cvOneDOptions *opts, cvOneDSynchronizer *synch);
         void createAndRunModel(cvOneDOptions *opts);

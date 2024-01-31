@@ -65,13 +65,13 @@ int OneDSolverInterface::getDataTableIDFromStringKey(string key){
 // ===============================
 // CREATE MODEL AND RUN SIMULATION
 // ===============================
-cvOneDModelManager* OneDSolverInterface::setupModelManager(cvOneDOptions* opts){
+void OneDSolverInterface::setupModelManager(cvOneDOptions* opts,cvOneDModelManager* oned){
     // MESSAGE
     printf("\n");
     printf("Creating and Running Model ...\n");
 
-    // CREATE MODEL MANAGER
-    cvOneDModelManager* oned = new cvOneDModelManager((char*)opts->modelName.c_str());
+
+    //cvOneDModelManager* oned = new cvOneDModelManager((char*)opts->modelName.c_str());
 
     // CREATE NODES
     printf("Creating Nodes ... \n");
@@ -257,17 +257,29 @@ cvOneDModelManager* OneDSolverInterface::setupModelManager(cvOneDOptions* opts){
     }
 
 
-    return oned;
+    //return oned;
 }
 void OneDSolverInterface::createAndRunModel(cvOneDOptions* opts){
     auto synch=new cvOneDSynchronizer();
     createAndRunModel(opts, synch);
+    delete synch;
+}
+/*
+void OneDSolverInterface::setupModeluntilNewton(){
 
 }
 
+void OneDSolverInterface::performNewton(){
+
+}
+*/
+
 void OneDSolverInterface::createAndRunModel(cvOneDOptions* opts, cvOneDSynchronizer* synch){
 
-   auto oned= setupModelManager(opts);
+    // CREATE MODEL MANAGER
+    cvOneDModelManager* oned = new cvOneDModelManager((char*)opts->modelName.c_str());
+
+    setupModelManager(opts,oned);
     double* vals;
     int tot;
 
@@ -305,6 +317,7 @@ void OneDSolverInterface::createAndRunModel(cvOneDOptions* opts, cvOneDSynchroni
   }
   delete [] inletCurveTime;
   delete [] inletCurveValue;
+  delete [] oned;
 }
 
 // ======================
