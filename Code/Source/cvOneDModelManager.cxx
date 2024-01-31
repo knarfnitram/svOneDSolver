@@ -252,6 +252,39 @@ int cvOneDModelManager::ConvertandCheckBound(BoundCondTypeScope::BoundCondType *
     return 0;
 }
 
+void cvOneDModelManager::Set_Simulation_for_external_coulping(double dt, long stepSize,
+                                          long maxStep, long quadPoints,
+                                          int len, char* boundType, double* values,
+                                          double* times, double conv, int useIV, int usestab,
+                                          cvOneDSynchronizer* sync){
+
+    // set the creation flag to off.
+    cvOneDGlobal::isCreating = false;
+    BoundCondTypeScope::BoundCondType boundT;
+    ConvertandCheckBound(&boundT, boundType);
+
+    // Set Solver Options
+    cvOneDMthSegmentModel::STABILIZATION = usestab; // 1=stabilization, 0=none
+    cvOneDGlobal::CONSERVATION_FORM = useIV;
+    cvOneDBFSolver::ASCII = 1;
+
+    cvOneDBFSolver::SetModelPtr(cvOneDGlobal::gModelList[cvOneDGlobal::currentModel]);
+
+    // We need to get these from the solver
+    cvOneDBFSolver::SetDeltaTime(dt);
+    cvOneDBFSolver::SetStepSize(stepSize);
+    cvOneDBFSolver::SetMaxStep(maxStep);
+    cvOneDBFSolver::SetQuadPoints(quadPoints);
+    cvOneDBFSolver::SetInletBCType(boundT);
+    cvOneDBFSolver::DefineInletFlow(times, values, len);
+    cvOneDBFSolver::SetConvergenceCriteria(conv);
+    cvOneDBFSolver::SetSynchronizerPtr(sync);
+
+    cvOneDGlobal::isSolving = true;
+    cvOneDBFSolver::PreSolveInit();
+    cvOneDBFSolver::Initialize();
+
+}
 
 int cvOneDModelManager::SolveCoupledModel(double dt, long stepSize,
                                    long maxStep, long quadPoints,

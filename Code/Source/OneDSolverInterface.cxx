@@ -264,15 +264,44 @@ void OneDSolverInterface::createAndRunModel(cvOneDOptions* opts){
     createAndRunModel(opts, synch);
     delete synch;
 }
-/*
-void OneDSolverInterface::setupModeluntilNewton(){
+
+void OneDSolverInterface::setupModeluntilNewton(cvOneDOptions* opts, cvOneDSynchronizer* synch){
+    cvOneDModelManager* oned = new cvOneDModelManager((char*)opts->modelName.c_str());
+
+    setupModelManager(opts,oned);
+    double* vals;
+    int tot;
+
+    // SOLVE MODEL
+    printf("Solving Model ... \n");
+
+    string inletCurveName = opts->inletDataTableName;
+    int inletCurveIDX = getDataTableIDFromStringKey(inletCurveName);
+    int inletCurveTotals = cvOneDGlobal::gDataTables[inletCurveIDX]->getSize();
+    double* inletCurveTime = new double[inletCurveTotals];
+    double* inletCurveValue = new double[inletCurveTotals];
+    for(int loopB=0;loopB<inletCurveTotals;loopB++){
+        inletCurveTime[loopB] = cvOneDGlobal::gDataTables[inletCurveIDX]->getTime(loopB);
+        inletCurveValue[loopB] = cvOneDGlobal::gDataTables[inletCurveIDX]->getValues(loopB);
+    }
+
+    oned->Set_Simulation_for_external_coulping(opts->timeStep,
+                                                  opts->stepSize,
+                                                  opts->maxStep,
+                                                  opts->quadPoints,
+                                                  inletCurveTotals,
+                                                  (char*)opts->boundaryType.c_str(),
+                                                  inletCurveValue,
+                                                  inletCurveTime,
+                                                  opts->convergenceTolerance,
+// Formulation Type
+                                                  opts->useIV,
+// Stabilization
+                                                  opts->useStab,synch);
 
 }
 
-void OneDSolverInterface::performNewton(){
 
-}
-*/
 
 void OneDSolverInterface::createAndRunModel(cvOneDOptions* opts, cvOneDSynchronizer* synch){
 
@@ -317,7 +346,6 @@ void OneDSolverInterface::createAndRunModel(cvOneDOptions* opts, cvOneDSynchroni
   }
   delete [] inletCurveTime;
   delete [] inletCurveValue;
-  delete [] oned;
 }
 
 // ======================

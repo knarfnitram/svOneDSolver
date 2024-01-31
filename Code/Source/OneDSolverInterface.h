@@ -57,7 +57,7 @@ extern "C" {
 
         int getDataTableIDFromStringKey(string key);
 
-        void  setupModelManager(cvOneDOptions *opts,cvOneDModelManager *oned );
+        void setupModelManager(cvOneDOptions *opts,cvOneDModelManager *oned );
 
         void createAndRunModel(cvOneDOptions *opts, cvOneDSynchronizer *synch);
         void createAndRunModel(cvOneDOptions *opts);
@@ -66,8 +66,20 @@ extern "C" {
 
         void readModel(string inputFile, cvOneDOptions *opts);
 
-        void SetupCoupling();
-
+        void setupModeluntilNewton(cvOneDOptions* opts, cvOneDSynchronizer* synch);
+        void UpdateTimeStep(void){
+            manager->UpdateTimeStep();
+        }
+        void Do_Newton_Step(int *iter){
+            manager->Do_Newton_Step(iter);
+        }
+        void SynchronizeDataofStep(int step){
+            manager->SynchronizeDataofStep(step);
+        }
+        void UpdateSolution(int iter, int step){
+            manager->UpdateSolution(iter,step);
+        }
+        cvOneDModelManager *manager;
 
     };
 #ifdef __cplusplus

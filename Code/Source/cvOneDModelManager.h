@@ -86,7 +86,29 @@ class cvOneDModelManager{
                               double* times, double conv, int useIV, int usestab,
                               cvOneDSynchronizer* sync);
 
+
+
     int ConvertandCheckBound(BoundCondTypeScope::BoundCondType *boundT,char* boundType);
+
+    // Interfaces for external coupling
+    void Set_Simulation_for_external_coulping(double dt, long stepSize,
+                                              long maxStep, long quadPoints,
+                                              int len, char* boundType, double* values,
+                                              double* times, double conv, int useIV, int usestab,
+                                              cvOneDSynchronizer* sync);
+
+    void UpdateTimeStep(){
+        cvOneDBFSolver::UpdateTimeStep();
+    }
+    void SynchronizeDataofStep(int step){
+        cvOneDBFSolver::SynchronizeDataofStep(step);
+    }
+    void Do_Newton_Step(int *iter){
+        cvOneDBFSolver::Do_Newton_Step(iter);
+    }
+    void UpdateSolution(int iter, int step){
+        cvOneDBFSolver::UpdateSolution(iter,step);
+    }
 };
 
 #endif // CVONEDMODELMANAGER_H
