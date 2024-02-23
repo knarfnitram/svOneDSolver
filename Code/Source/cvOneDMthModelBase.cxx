@@ -201,7 +201,7 @@ double cvOneDMthModelBase::CheckMassBalance(){
   long eqNumbers[2];  // Two degress of freedom per node
   double inletFlow = GetFlowRate();
 
-  if(cvOneDBFSolver::inletBCtype == BoundCondTypeScope::FLOW or cvOneDBFSolver::inletBCtype ==BoundCondTypeScope::FLOW ){
+  if(cvOneDBFSolver::inletBCtype == BoundCondTypeScope::FLOW or cvOneDBFSolver::inletBCtype ==BoundCondTypeScope::COUPLING_3D_1D ){
     inletFlow = GetFlowRate();
   }else{
    GetNodalEquationNumbers( 0, eqNumbers, 0);
@@ -605,8 +605,9 @@ void cvOneDMthModelBase::SetInflowRate(double *t, double *flow, int size, double
   time[i] = t[i];
   flrt[i] = flow[i];
   }
+  nFlowPts=size;
   cycleTime = cycleT;
-  nFlowPts = size; //added by bnsteel
+  //nFlowPts = size; //added by bnsteel
 }
 
 int cvOneDMthModelBase::Get_Pressure_Position(){
@@ -621,19 +622,15 @@ int cvOneDMthModelBase::Get_Pressure_Position(){
     return inletpressure_List.front();
 }
 
-void cvOneDMthModelBase::UpdateInflowRate(double flow,int i) {
+void cvOneDMthModelBase::UpdateInflowRate(double flow,int step) {
 
-    //cout<<"Time and flow rate bevore after: " << time[i] << ", " << flrt[i] << endl;
-    double correctedTime = currentTime - static_cast<long>(currentTime / cycleTime) * cycleTime;
-    int ptr = 0;
-    bool wasFound = false;
-    while( !wasFound){
-        if( correctedTime >= time[ptr] && correctedTime <= time[ptr+1])
-            wasFound = true;
-        else
-            ptr++;
+    cout<<"Time and flow rate bevore after: " << time[step] << ", " << flrt[step] << endl;
+    if(step >nFlowPts){
+        printf("%d is bigger than maximum array %d size of inflow rates ",step,nFlowPts);
+        throw ("no segfault.");
     }
-    flrt[ptr] = flow;
+    flrt[step] = flow;
+    cout<<"flow rate after update : " << flrt[step] << endl;
 }
 
 double cvOneDMthModelBase::GetFlowRate(){
@@ -662,7 +659,9 @@ double cvOneDMthModelBase::GetFlowRate(){
   double xi = (correctedTime - time[ptr]) / (time[ptr+1] - time[ptr]);
   // Return
   double result = flrt[ptr] + xi * (flrt[ptr+1] - flrt[ptr]);
-  //printf("Result Flow: %e\n",result);
+    printf("Interpolation between : %e %e %e\n",xi,flrt[ptr],flrt[ptr+1]);
+  printf("Result Flow: %e\n",result);
+    printf("Result Time: %e\n",correctedTime);
   return result;
 
 }

@@ -33,23 +33,40 @@ public:
     // set the 1d pressure at time point
     void Set_1D_p_at_t(double t,double p);
 
+    void Set_1D_q_at_t(double t,double p);
+
+    double Get_1d_q_at_t(double t);
+
     // set the 3d flow at specified time point
     void Set_3d_q_at_t(double t,double q);
 
     // get the 1d pressure at time point
     double Get_1d_p_at_t(double t);
 
+    // set the 3d pressure at specified time point
+    void Set_3d_p_at_t(double t,double p);
+
     // check if the object was set up correctly
     bool is_initialized();
 
     void Initialize(int time_steps, double dt_);
+
+    double* get_q_1d(void){ return q_1d;};
+
+    double* get_t(void){return time_array;};
+
+    void Print(void);
+
+    int get_max_time_steps(void){return max_time_steps;};
+
+    void Print_Item(string name, double * value);
     private:
 
     // maximum time steps
     int max_time_steps;
 
     // time step size
-    double dt;
+    double dt_;
 
     // flow array
     double* q_1d;
@@ -59,7 +76,12 @@ public:
     double* p_3d;
     double* p_1d;
 
+    // time array
+    double* time_array;
+
     int calculate_step(double time);
+
+
 };
 #ifdef __cplusplus
 }

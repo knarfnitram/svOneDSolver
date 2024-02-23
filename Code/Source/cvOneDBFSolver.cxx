@@ -597,6 +597,22 @@ void cvOneDBFSolver::postprocess_VTK_XML3D_ONEFILE(){
       }
       fprintf(vtkFile,"</DataArray>\n");
 
+
+      // PRINT PRESSURE
+        fprintf(vtkFile,"<DataArray type=\"Float32\" Name=\"Pressure_INCR_%05ld_TIME_%.5f\" NumberOfComponents=\"1\" format=\"ascii\">\n",loopTime*stepSize,loopTime*deltaTime*stepSize);
+        segLength = currSeg->getSegmentLength();
+        curMat = subdomainList[loopSegment]->GetMaterial();
+        section = 0;
+        for(int j=startOut;j<finishOut;j+=2){
+            z = (section/(double)currSeg->getNumElements())*segLength;
+            for(int k=0;k<circSubdiv;k++){
+                fprintf(vtkFile,"%e ",curMat->GetPressure(TotalSolution[loopTime][j],z));
+            }
+            fprintf(vtkFile,"\n");
+            section++;
+        }
+        fprintf(vtkFile,"</DataArray>\n");
+
       // PRINT REYNOLDS NUMBER
       fprintf(vtkFile,"<DataArray type=\"Float32\" Name=\"Reynolds_INCR_%05ld_TIME_%.5f\" NumberOfComponents=\"1\" format=\"ascii\">\n",loopTime*stepSize,loopTime*deltaTime*stepSize);
       curMat = subdomainList[loopSegment]->GetMaterial();
@@ -935,6 +951,22 @@ void cvOneDBFSolver::postprocess_VTK_XML3D_MULTIPLEFILES(){
         section++;
       }
       fprintf(vtkFile,"</DataArray>\n");
+
+
+    // PRINT PRESSURE
+    fprintf(vtkFile,"<DataArray type=\"Float32\" Name=\"Pressure\" NumberOfComponents=\"1\" format=\"ascii\">\n");
+    segLength = currSeg->getSegmentLength();
+    section = 0;
+    for(int j=startOut;j<finishOut;j+=2){
+        z = (section/(double)currSeg->getNumElements())*segLength;
+        for(int k=0;k<circSubdiv;k++){
+            fprintf(vtkFile,"%e ",curMat->GetPressure(TotalSolution[loopTime][j],z));
+        }
+        fprintf(vtkFile,"\n");
+        section++;
+    }
+    fprintf(vtkFile,"</DataArray>\n");
+
 
       // PRINT REYNOLDS NUMBER
       fprintf(vtkFile,"<DataArray type=\"Float32\" Name=\"Reynolds\" NumberOfComponents=\"1\" format=\"ascii\">\n");
@@ -1578,21 +1610,36 @@ void cvOneDBFSolver::SynchronizeDataofStep(int step){
     // simply check if the synchronizer is set up,
     // if not continue without updating the data
     if(synchronizer->is_initialized()){
+        cout<<"cvOneDBFSolver: flow rate"<< endl;
+
+
         double new_flow=synchronizer->Get_3d_q_at_t(currentTime);
+
         mathModels[0]->UpdateInflowRate(new_flow,step);
+        mathModels[0]->UpdateInflowRate(new_flow,step+1);
+
+        cout<<"cvOneDBFSolver: using new flow: "<<new_flow<<" from " << currentTime << std::endl;
 
         // extract inlet condition
         long eqNumbers[2];
+
         // inlet is set per default on the first position
         mathModels[0]->GetNodalEquationNumbers( 0, eqNumbers, 0);
+
         // extract the area
         cvOneDMaterial* curMat = subdomainList[0]->GetMaterial();
         double area=currentSolution-> GetEntries()[eqNumbers[0]];
-        // calculate the pressure with the material
-        synchronizer->Set_1D_p_at_t(currentTime,curMat->GetPressure(area,0));
-        //cout <<"Time: "<<currentTime<<" " <<"pressure: " <<curMat->GetPressure(area,0) << endl;
-    }
 
+        cout << "yes"<< endl;
+        // calculate the pressure with the material
+        // TODO CHeck if this returns the flow rate
+        synchronizer->Set_1D_q_at_t(currentTime,currentSolution->Get(1));
+        cout << "yes"<< endl;
+        synchronizer->Set_1D_p_at_t(currentTime,curMat->GetPressure(area,0));
+
+        cout <<"cvOneDBFSolver: Time: "<<currentTime<<" " <<"pressure: " <<curMat->GetPressure(area,0) << endl;
+
+    }
 
 
 }

@@ -103,11 +103,15 @@ class cvOneDModelManager{
     void SynchronizeDataofStep(int step){
         cvOneDBFSolver::SynchronizeDataofStep(step);
     }
-    void Do_Newton_Step(int *iter){
-        cvOneDBFSolver::Do_Newton_Step(iter);
+    bool Do_Newton_Step(int *iter){
+        return cvOneDBFSolver::Do_Newton_Step(iter);
     }
     void UpdateSolution(int iter, int step){
         cvOneDBFSolver::UpdateSolution(iter,step);
+    }
+
+    void DoPostProcessing(void){
+        cvOneDBFSolver::DoPostProcessing();
     }
 };
 

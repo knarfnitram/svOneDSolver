@@ -70,8 +70,8 @@ extern "C" {
         void UpdateTimeStep(void){
             manager->UpdateTimeStep();
         }
-        void Do_Newton_Step(int *iter){
-            manager->Do_Newton_Step(iter);
+        bool Do_Newton_Step(int *iter){
+            return manager->Do_Newton_Step(iter);
         }
         void SynchronizeDataofStep(int step){
             manager->SynchronizeDataofStep(step);
@@ -79,6 +79,10 @@ extern "C" {
         void UpdateSolution(int iter, int step){
             manager->UpdateSolution(iter,step);
         }
+        void DoPostProcessing(void){
+            manager->DoPostProcessing();
+        }
+
         cvOneDModelManager *manager;
 
     };

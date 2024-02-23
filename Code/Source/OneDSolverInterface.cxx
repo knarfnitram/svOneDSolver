@@ -326,14 +326,15 @@ void OneDSolverInterface::createAndRunModel(cvOneDOptions* opts, cvOneDSynchroni
     }
    int solveError = CV_OK;
   // Solve Model
+  // Here we reference the array of the synch
   solveError = oned->SolveCoupledModel(opts->timeStep,
                                 opts->stepSize,
                                 opts->maxStep,
                                 opts->quadPoints,
                                 inletCurveTotals,
                                 (char*)opts->boundaryType.c_str(),
-                                inletCurveValue,
-                                inletCurveTime,
+                                       inletCurveTime,
+                                       inletCurveValue,
                                 opts->convergenceTolerance,
                                 // Formulation Type
                                 opts->useIV,
