@@ -43,6 +43,7 @@ int cvOneDSynchronizer::calculate_step(double time){
     if(step > max_time_steps){
         std::cout<<"step is bigger than max_time_steps"<<std::endl;
         std::cout<<step<<" "<<max_time_steps<<std::endl;
+        std::cout<<"time"<<time <<dt_ <<std::endl;
         throw "currently the synchronizer does not support stepsizes bigger than:";
     }
     return step;

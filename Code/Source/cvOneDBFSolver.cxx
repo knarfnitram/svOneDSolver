@@ -1591,7 +1591,7 @@ void cvOneDBFSolver::UpdateTimeStep(void){
     for(int i = 0; i < mathModels.size(); i++){
         mathModels[i]->TimeUpdate(currentTime, deltaTime);
     }
-
+    cout <<"update time to: " <<currentTime<<std::endl;
     /* idk what that did do:
      * int numberOfCycle = 1;
      * double cycleTime = mathModels[0]->GetCycleTime();
@@ -1634,10 +1634,10 @@ void cvOneDBFSolver::SynchronizeDataofStep(int step){
         // calculate the pressure with the material
         // TODO CHeck if this returns the flow rate
         synchronizer->Set_1D_q_at_t(currentTime,currentSolution->Get(1));
-        cout << "yes"<< endl;
-        synchronizer->Set_1D_p_at_t(currentTime,curMat->GetPressure(area,0));
+        cout << currentSolution->Get(0)<< endl;
+        synchronizer->Set_1D_p_at_t(currentTime,curMat->GetPressure(currentSolution->Get(2),0.0));
 
-        cout <<"cvOneDBFSolver: Time: "<<currentTime<<" " <<"pressure: " <<curMat->GetPressure(area,0) << endl;
+        cout <<"cvOneDBFSolver: Time: "<<currentTime<<" " <<"pressure: " <<curMat->GetPressure(area,0.0) << endl;
 
     }
 

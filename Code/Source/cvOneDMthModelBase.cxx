@@ -630,6 +630,7 @@ void cvOneDMthModelBase::UpdateInflowRate(double flow,int step) {
         throw ("no segfault.");
     }
     flrt[step] = flow;
+    flrt[step+1] = flow;
     cout<<"flow rate after update : " << flrt[step] << endl;
 }
 
