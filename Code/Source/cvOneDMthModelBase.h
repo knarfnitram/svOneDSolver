@@ -79,9 +79,9 @@ class cvOneDMthModelBase{
     double GetCycleTime() const {return cycleTime;}
 
 
-
-  protected:
     double GetFlowRate();
+  protected:
+
 
     typeOfEquation type;
     long numberOfEquations;
