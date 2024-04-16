@@ -1436,6 +1436,10 @@ void cvOneDBFSolver::Initialize(void){
 
 bool cvOneDBFSolver::Do_Newton_Step(int *iter){
 
+    if(*iter==0){
+        increment->Clear();
+        *currentSolution=*previousSolution;
+    }
 
     static double normf ;
     static double norms ;
@@ -1585,6 +1589,8 @@ bool cvOneDBFSolver::Do_Newton_Step(int *iter){
 
 }
 
+
+
 void cvOneDBFSolver::UpdateTimeStep(void){
     *previousSolution = *currentSolution;
     increment->Clear();
@@ -1615,8 +1621,9 @@ void cvOneDBFSolver::SynchronizeDataofStep(int step){
 
         double new_flow=synchronizer->Get_3d_q_at_t(currentTime);
 
-        mathModels[0]->UpdateInflowRate(new_flow,step);
-        mathModels[0]->UpdateInflowRate(new_flow,step+1);
+        mathModels[0]->UpdateInflowRate(new_flow,currentTime-deltaTime);
+        mathModels[0]->UpdateInflowRate(new_flow,currentTime);
+        //mathModels[0]->UpdateInflowRate(new_flow,currentTime+deltaTime);
 
         cout<<"cvOneDBFSolver: using new flow: "<<new_flow<<" from " << currentTime << std::endl;
 
@@ -1633,11 +1640,16 @@ void cvOneDBFSolver::SynchronizeDataofStep(int step){
         cout << "yes"<< endl;
         // calculate the pressure with the material
         // TODO CHeck if this returns the flow rate
+        synchronizer->Set_1D_q_at_t(currentTime-deltaTime,currentSolution->Get(1));
         synchronizer->Set_1D_q_at_t(currentTime,currentSolution->Get(1));
         cout << currentSolution->Get(0)<< endl;
         synchronizer->Set_1D_p_at_t(currentTime,curMat->GetPressure(currentSolution->Get(2),0.0));
 
         cout <<"cvOneDBFSolver: Time: "<<currentTime<<" " <<"pressure: " <<curMat->GetPressure(area,0.0) << endl;
+        cout <<"cvOneDBFSolver: Time: "<<currentTime<<" " <<"flow: " << mathModels[0]->GetFlowRate() << endl;
+
+        // TODO The flow in the synchronizer here is wrong?
+        //cout <<"cvOneDBFSolver: Time: "<<currentTime<<" " <<"flow: " <<Get << endl;
 
     }
 

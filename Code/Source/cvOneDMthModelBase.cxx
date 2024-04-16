@@ -201,9 +201,9 @@ double cvOneDMthModelBase::CheckMassBalance(){
   long eqNumbers[2];  // Two degress of freedom per node
   double inletFlow = GetFlowRate();
 
-  if(cvOneDBFSolver::inletBCtype == BoundCondTypeScope::FLOW or cvOneDBFSolver::inletBCtype ==BoundCondTypeScope::COUPLING_3D_1D ){
-    inletFlow = GetFlowRate();
-  }else{
+  if(cvOneDBFSolver::inletBCtype == BoundCondTypeScope::FLOW or cvOneDBFSolver::inletBCtype ==BoundCondTypeScope::COUPLING_3D_1D ) {
+      inletFlow = GetFlowRate();
+  }else {
    GetNodalEquationNumbers( 0, eqNumbers, 0);
    inletFlow = (*currSolution)[eqNumbers[1]];
   }
@@ -622,16 +622,22 @@ int cvOneDMthModelBase::Get_Pressure_Position(){
     return inletpressure_List.front();
 }
 
-void cvOneDMthModelBase::UpdateInflowRate(double flow,int step) {
-
-    cout<<"Time and flow rate bevore after: " << time[step] << ", " << flrt[step] << endl;
-    if(step >nFlowPts){
-        printf("%d is bigger than maximum array %d size of inflow rates ",step,nFlowPts);
+void cvOneDMthModelBase::UpdateInflowRate(double flow,double search_time) {
+    int step=0;
+    for (int i = 0; i < nFlowPts; ++i) {
+        if(time[i]>search_time){
+            step= i-1;
+            break;
+        }
+    }
+    cout<<"Time and flow rate before: " << time[step] << ", " << flrt[step] << "flow:"<<flow<< endl;
+    if(step >nFlowPts || step<0){
+        printf("%d exceeds the array %d size of inflow rates ",step, nFlowPts);
         throw ("no segfault.");
     }
+
     flrt[step] = flow;
-    flrt[step+1] = flow;
-    cout<<"flow rate after update : " << flrt[step] << endl;
+    cout<<"Time and flow rate after update : " << flrt[step] << endl;
 }
 
 double cvOneDMthModelBase::GetFlowRate(){
@@ -666,4 +672,3 @@ double cvOneDMthModelBase::GetFlowRate(){
   return result;
 
 }
-
