@@ -100,8 +100,11 @@ void cvOneDSubdomain::SetupMaterial(int matID){
 void cvOneDSubdomain::SetBoundValue(double boundV){
   switch(boundType){
     case BoundCondTypeScope::PRESSURE:
-      boundValue = mat->GetArea(boundV, fabs(z_out-z_in));
+        boundValue = mat->GetArea(boundV, fabs(z_out-z_in));
       break;
+      case BoundCondTypeScope::COUPLING_1D_3D:
+          boundValue = mat->GetArea(boundV, fabs(z_out-z_in));
+          break;
     default:
       boundValue = boundV;
       break;

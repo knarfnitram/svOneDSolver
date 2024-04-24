@@ -83,8 +83,10 @@ int cvOneDModelManager::CreateSegment(char   *segName,long segID, double  segLen
     boundT = BoundCondTypeScope::NOBOUND;
   }else if(!strcmp(boundType, "PRESSURE")) {
       boundT = BoundCondTypeScope::PRESSURE;
-  }else if(!strcmp(boundType, "COUPLING_3D_1D")){
+  }else if(!strcmp(boundType, "COUPLING_3D_1D")) {
       boundT = BoundCondTypeScope::COUPLING_3D_1D;
+  }else if(!strcmp(boundType, "COUPLING_1D_3D")){
+      boundT = BoundCondTypeScope::COUPLING_1D_3D;
   }else if(!strcmp(boundType, "RESISTANCE")){
     boundT = BoundCondTypeScope::RESISTANCE;
   }else if(!strcmp(boundType, "PRESSURE_WAVE")){
@@ -148,8 +150,9 @@ int cvOneDModelManager::CreateSegment(char   *segName,long segID, double  segLen
   switch(boundT) {
   case BoundCondTypeScope::PRESSURE_WAVE:
       seg->setBoundPressureValue(value,time,num);
-          printf("yes-pressurewave");
       break;
+  case BoundCondType::COUPLING_1D_3D:
+      seg->setBoundPressureValue(value,time,num);
   case BoundCondTypeScope::RESISTANCE_TIME:
       seg->setBoundResistanceValue(value,time,num);
       break;
@@ -225,6 +228,9 @@ int cvOneDModelManager::ConvertandCheckBound(BoundCondTypeScope::BoundCondType *
     }else if(!strcmp( boundType, "PRESSURE")){
         *boundT = BoundCondTypeScope::PRESSURE;
         printf("Inlet Condition Type: PRESSURE\n");
+    }else if(!strcmp( boundType, "COUPLING_1D_3D")){
+        *boundT = BoundCondTypeScope::COUPLING_1D_3D;
+        printf("Inlet Condition Type: 1D_3D_COUPLING\n");
     }else if(!strcmp( boundType, "PRESSURE_WAVE")){
         *boundT = BoundCondTypeScope::PRESSURE_WAVE;
         printf("Inlet Condition Type: PRESSURE_WAVE\n");

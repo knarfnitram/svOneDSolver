@@ -74,6 +74,8 @@ class cvOneDMthModelBase{
     virtual void EquationInitialize(const cvOneDFEAVector* pSolution, cvOneDFEAVector* cSolution){prevSolution = pSolution; currSolution = cSolution;}
     virtual void SetInflowRate(double *t, double *flow, int size, double cycleT);
     virtual void UpdateInflowRate(double flow, double search_time);
+    virtual void UpdateCouplingPressure(double pressure);
+    double GetCouplingPressure(){return coupling_pressure;}
     virtual int Get_Pressure_Position();
     typeOfEquation GetType() const {return type;}
     double GetCycleTime() const {return cycleTime;}
@@ -110,6 +112,7 @@ class cvOneDMthModelBase{
     double currentTime;    // t_{n+1}
     double *flrt, *time;
     double cycleTime;
+    double coupling_pressure;
     int  nFlowPts; // added by bnsteel
 
 };

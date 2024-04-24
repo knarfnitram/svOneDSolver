@@ -21,33 +21,41 @@ public:
     // I would like too get this quantity from my the guy with the other coupling id
 
     // Constructor
-    cvOneDSynchronizer(int time_steps, double dt_);
+    cvOneDSynchronizer(int time_steps, double dt,int max_ids, int coupling_types);
 
     // uninitialized default Constructor
     cvOneDSynchronizer();
     ~cvOneDSynchronizer();
 
-    // get the 3d averaged flow data at specific time point
-    double Get_3d_q_at_t(double t);
+    // get the 3d averaged flow data at specific time point of the id
+    double Get_3d_q_at_t(double t,int id);
 
-    // set the 1d pressure at time point
-    void Set_1D_p_at_t(double t,double p);
+    // get the 3d averaged pressure data at specific time point of the id
+    double Get_3d_p_at_t(double t,int id);
 
-    void Set_1D_q_at_t(double t,double p);
+    // set the 1d pressure at time point of the id
+    void Set_1D_p_at_t(double t,double p,int id);
 
-    double Get_1d_q_at_t(double t);
+    void Set_1D_q_at_t(double t,double p,int id);
 
-    // set the 3d flow at specified time point
-    void Set_3d_q_at_t(double t,double q);
+    double Get_1d_q_at_t(double t,int id);
 
-    // get the 1d pressure at time point
-    double Get_1d_p_at_t(double t);
+    // set the 3d flow at specified time point of the id
+    void Set_3d_q_at_t(double t,double q,int id);
+
+    // get the 1d pressure at time point of the id
+    double Get_1d_p_at_t(double t,int id);
 
     // set the 3d pressure at specified time point
-    void Set_3d_p_at_t(double t,double p);
+    void Set_3d_p_at_t(double t,double p,int id);
 
     // check if the object was set up correctly
     bool is_initialized();
+
+    bool Get_coupling_3d_1d_info(){ return coupling_3d_1d_;}
+
+    bool Get_coupling_1d_3d_info(){ return coupling_1d_3d_;}
+
 
     void Initialize(int time_steps, double dt_);
 
@@ -57,10 +65,19 @@ public:
 
     void Print(void);
 
+    void Print_id(int id);
+
     int get_max_time_steps(void){return max_time_steps;};
 
+    // Print item with ID
+    void Print_Item(string name, double * value, int id);
+
+    // Print all items
     void Print_Item(string name, double * value);
-    private:
+
+
+
+private:
 
     // maximum time steps
     int max_time_steps;
@@ -79,10 +96,24 @@ public:
     // time array
     double* time_array;
 
-    int calculate_step(double time);
+    // max_id starts from 1 up to ...
+    int max_ids_;
+
+    // return the step size according to the given time
+    int Calculate_Step(double time);
+
+    // return the step size accoriding to the given time and
+    int Calculate_Step(double time, const int id);
+
+    // indicate if a 3d domain is used as a inflow condition for the artery
+    bool coupling_3d_1d_;
+
+    // indicate if a 3d domain is coupled at one outlet
+    bool coupling_1d_3d_;
 
 
 };
+
 #ifdef __cplusplus
 }
 #endif

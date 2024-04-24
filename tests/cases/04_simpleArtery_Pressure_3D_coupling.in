@@ -118,7 +118,7 @@ MATERIAL MAT1 OLUFSEN 1.06 0.04 113324.0 1.0 2.0e7 -22.5267 8.65e5
 # - Formulation Type (int - 0 Advective, 1 Conservative), 
 # - Stabilization (int - 0 No stabilization, 1 With stabilization)
 
-SOLVEROPTIONS 0.01 10 1000 2 INLETDATA COUPLING_3D_1D 1.0e-6 1 1
+SOLVEROPTIONS 0.01 10 1000 2 INLETDATA s 1.0e-6 1 1
 
 
 # ===========

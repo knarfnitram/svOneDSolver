@@ -165,6 +165,13 @@ void cvOneDMthModelBase::SetBoundaryConditions(){
   */
     switch(sub->GetBoundCondition()){
     case BoundCondTypeScope::PRESSURE:
+        (*currSolution)[eqNumbers[0]] = sub->GetBoundFlowRate();
+        break;
+    case BoundCondTypeScope::COUPLING_1D_3D:
+        sub->SetBoundValue(coupling_pressure);
+        // TODO for some reason the coupling pressure is not working properly
+        // set up a unit-testcase where you increase the pressure and see how simulation changes
+        std::cout << "Me updating the coupling pressure: "<< coupling_pressure << " to: " << sub->GetMaterial()->GetArea(coupling_pressure,sub->GetLength()) << std::endl;
       (*currSolution)[eqNumbers[0]] = sub->GetBoundFlowRate();
       break;
     case BoundCondTypeScope::FLOW or BoundCondTypeScope::COUPLING_3D_1D:
@@ -263,6 +270,7 @@ void cvOneDMthModelBase::ApplyBoundaryConditions(){
       value = 0.0;  // RHS corresponding to imposed Essential BC
 
       switch(sub->GetBoundCondition()){
+        case BoundCondType::COUPLING_1D_3D:
         case BoundCondTypeScope::PRESSURE:
         case BoundCondTypeScope::PRESSURE_WAVE:
           cvOneDGlobal::solver->SetSolution( eqNumbers[0], value);
@@ -395,6 +403,7 @@ void cvOneDMthModelBase::ApplyBoundaryConditions(){
           // for these BC the Inlet term doesn't have to be specialized
           // so same treatment as regular Essential BC like in Brooke's
           case BoundCondTypeScope::PRESSURE:
+              case BoundCondTypeScope::COUPLING_1D_3D:
           case BoundCondTypeScope::PRESSURE_WAVE:
             cvOneDGlobal::solver->SetSolution( eqNumbers[0], value);
             break;
@@ -610,6 +619,10 @@ void cvOneDMthModelBase::SetInflowRate(double *t, double *flow, int size, double
   //nFlowPts = size; //added by bnsteel
 }
 
+void cvOneDMthModelBase::UpdateCouplingPressure(double pressure){
+    coupling_pressure=pressure;
+}
+
 int cvOneDMthModelBase::Get_Pressure_Position(){
     if(inletpressure_List.size()>1){
         std::cout<<"Congratulations, currently we only support 1 coupling Condition. Feel free to add some more."<< std::endl;
@@ -623,14 +636,15 @@ int cvOneDMthModelBase::Get_Pressure_Position(){
 }
 
 void cvOneDMthModelBase::UpdateInflowRate(double flow,double search_time) {
-    int step=0;
+    //int step=0;
+    int step=nFlowPts;
     for (int i = 0; i < nFlowPts; ++i) {
-        if(time[i]>search_time){
-            step= i-1;
-            break;
+        if(abs(time[i]-search_time) < abs( time[step] - search_time)){
+            step= i;
+            //break;
         }
     }
-    cout<<"Time and flow rate before: " << time[step] << ", " << flrt[step] << "flow:"<<flow<< endl;
+    cout<<"Time and flow rate before: " << " " << time[step] << ", " << flrt[step] << "flow: "<<flow<< endl;
     if(step >nFlowPts || step<0){
         printf("%d exceeds the array %d size of inflow rates ",step, nFlowPts);
         throw ("no segfault.");
@@ -648,6 +662,11 @@ double cvOneDMthModelBase::GetFlowRate(){
     cout<<"Time and flow rate: " << time << ", " << flrt << endl;
     exit(1);
   }
+  std::cout <<"flrt"<<std::endl;
+  for(int i=0;i<nFlowPts;i++){
+      std::cout << flrt[i]<<" ";
+  }
+    std::cout << '\n';
 
   // Flow rate is assumed to be periodic
   double correctedTime = currentTime - static_cast<long>(currentTime / cycleTime) * cycleTime;
