@@ -1614,7 +1614,7 @@ void cvOneDBFSolver::SynchronizeDataofStep(int step){
 
     // simply check if the synchronizer is set up,
     // if not continue without updating the data
-    if(synchronizer->is_initialized() and synchronizer->Get_coupling_1d_3d_info()){
+    if(synchronizer->is_initialized() and synchronizer->Get_coupling_3d_1d_info()){
         cout<<"cvOneDBFSolver: flow rate"<< endl;
 
         int inflow_id =2;
@@ -1668,11 +1668,16 @@ void cvOneDBFSolver::SynchronizeDataofStep(int step){
             if(sub->GetBoundCondition()==BoundCondType::COUPLING_1D_3D) {
                 mathModels[0]->GetNodalEquationNumbers(subdomainList[*it]->GetNumberOfNodes() - 1, eqNumbers, *it);
                 std::cout << "equation numbers:" << eqNumbers[0] << " " <<eqNumbers[1]<<std::endl;
+                std::cout << "solution at equation numbers:" << currentSolution->Get(eqNumbers[0]) << " " <<currentSolution->Get(eqNumbers[1])<<std::endl;
 
+                std::cout << "currentTime:" << currentTime <<std::endl;
                 cvOneDMaterial* curMat = subdomainList[*it]->GetMaterial();
-                synchronizer->Set_1D_q_at_t(currentTime, currentSolution->Get(eqNumbers[0]), inflow_id);
-                synchronizer->Set_1D_p_at_t(currentTime, curMat->GetPressure(currentSolution->Get(eqNumbers[1]), 0.0), inflow_id);
-                std::cout << "Pressure:" << curMat->GetPressure(currentSolution->Get(eqNumbers[1]), 0.0) << " flow: " <<currentSolution->Get(eqNumbers[0])<<std::endl;
+                // TODO clearify when to take [0] and [1]
+                // TODO check again if right A(p) is set as vector
+                synchronizer->Set_1D_q_at_t(currentTime, currentSolution->Get(eqNumbers[1]), inflow_id);
+                std::cout<< currentSolution->Get(eqNumbers[0]) << " " << sub->GetLength()<< std::endl;
+                synchronizer->Set_1D_p_at_t(currentTime, curMat->GetPressure(currentSolution-> GetEntries()[(eqNumbers[0])], 1.0), inflow_id);
+                std::cout << "Pressure:" << curMat->GetPressure(currentSolution-> GetEntries()[(eqNumbers[0])], 1.0) << " flow: " <<currentSolution->Get(eqNumbers[1])<<std::endl;
             }
         }
     }

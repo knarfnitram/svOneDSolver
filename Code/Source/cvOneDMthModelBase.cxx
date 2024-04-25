@@ -171,8 +171,9 @@ void cvOneDMthModelBase::SetBoundaryConditions(){
         sub->SetBoundValue(coupling_pressure);
         // TODO for some reason the coupling pressure is not working properly
         // set up a unit-testcase where you increase the pressure and see how simulation changes
-        std::cout << "Me updating the coupling pressure: "<< coupling_pressure << " to: " << sub->GetMaterial()->GetArea(coupling_pressure,sub->GetLength()) << std::endl;
+        std::cout << "Me updating the coupling pressure: "<< coupling_pressure << " to: " << sub->GetMaterial()->GetArea(coupling_pressure,1.0) << std::endl;
       (*currSolution)[eqNumbers[0]] = sub->GetBoundFlowRate();
+      //(*currSolution)[eqNumbers[0]] = sub->GetMaterial()->GetArea(coupling_pressure,1.0);
       break;
     case BoundCondTypeScope::FLOW or BoundCondTypeScope::COUPLING_3D_1D:
       (*currSolution)[eqNumbers[1]] = sub->GetBoundFlowRate();

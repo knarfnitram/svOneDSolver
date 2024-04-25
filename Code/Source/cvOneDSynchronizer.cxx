@@ -76,7 +76,8 @@ int cvOneDSynchronizer::Calculate_Step(double time){
 }
 
 int cvOneDSynchronizer::Calculate_Step(double time, const int id){
-    return Calculate_Step(time)*id;
+    int step=Calculate_Step(time);
+    return step+step*id;
 }
 
 
@@ -135,7 +136,7 @@ void cvOneDSynchronizer::Set_3d_p_at_t(double t,double p,int id){
 void cvOneDSynchronizer::Print_Item(string name, double * value, int id){
     std::cout << name << ": ";
     for (int i = 0; i < max_time_steps; ++i) {
-        std::cout << value[i*(id-1)] << " ";
+        std::cout << value[i+i*(id-1)] << " ";
     }
     std::cout<< " " << std::endl;
 }
@@ -147,7 +148,7 @@ void cvOneDSynchronizer::Print_Item(string name, double * value){
         std::cout << id << ": ";
 
         for (int i = 0; i < max_time_steps; ++i) {
-            std::cout << value[i*(id-1)] << " ";
+            std::cout << value[i+i*(id-1)] << " ";
         }
         std::cout<< " " << std::endl;
     }
