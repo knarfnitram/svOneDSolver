@@ -599,7 +599,7 @@ void cvOneDBFSolver::postprocess_VTK_XML3D_ONEFILE(){
 
 
       // PRINT PRESSURE
-        fprintf(vtkFile,"<DataArray type=\"Float32\" Name=\"Pressure_INCR_%05ld_TIME_%.5f\" NumberOfComponents=\"1\" format=\"ascii\">\n",loopTime*stepSize,loopTime*deltaTime*stepSize);
+        fprintf(vtkFile,"<DataArray type=\"Float32\" Name=\"pressure_INCR_%05ld_TIME_%.5f\" NumberOfComponents=\"1\" format=\"ascii\">\n",loopTime*stepSize,loopTime*deltaTime*stepSize);
         segLength = currSeg->getSegmentLength();
         curMat = subdomainList[loopSegment]->GetMaterial();
         section = 0;
