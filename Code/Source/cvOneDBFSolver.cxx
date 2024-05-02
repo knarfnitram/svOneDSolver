@@ -1629,6 +1629,7 @@ void cvOneDBFSolver::SynchronizeDataofStep(int step){
         // extract inlet condition
         long eqNumbers[2];
 
+        // TODO Here is also one inflow assumption
         // inlet is set per default on the first position
         mathModels[0]->GetNodalEquationNumbers( 0, eqNumbers, 0);
 
@@ -1660,6 +1661,7 @@ void cvOneDBFSolver::SynchronizeDataofStep(int step){
         // TODO fix value which is responsibe for pressure bc
         long eqNumbers[2];  // two degress of freedom per node
 
+        // TODO Here is also one inflow assumption
         // Set up Inlet Dirichlet boundary condition (the default is flow rate)
         mathModels[0]->GetNodalEquationNumbers( 0, eqNumbers, 0);
 

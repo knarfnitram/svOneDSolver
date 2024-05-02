@@ -130,8 +130,10 @@ void cvOneDMthModelBase::SetBoundaryConditions(){
   double currP, currS, resistance;
 
   // Set up Inlet Dirichlet boundary condition (the default is flow rate)
+    // TODO Here is also one inflow assumption
   GetNodalEquationNumbers( 0, eqNumbers, 0);
   sub= subdomainList[0];
+  // TODO add here a loop for COUPLING Condition?
   switch(cvOneDBFSolver::inletBCtype){
     case BoundCondTypeScope::FLOW:
       (*currSolution)[eqNumbers[1]] = GetFlowRate();
@@ -246,6 +248,7 @@ void cvOneDMthModelBase::ApplyBoundaryConditions(){
     // Set up the inlet Dirichlet boundary condition (flow rate)
     // RHS corresponding to imposed Essential BC
     value = 0.0;
+    // TODO: Here is also the implict assumption, that we add the dirichlet condtion only at 1
     if(cvOneDBFSolver::inletBCtype == BoundCondTypeScope::FLOW or cvOneDBFSolver::inletBCtype == BoundCondTypeScope::COUPLING_3D_1D){
       GetNodalEquationNumbers(0, eqNumbers, 0);
       cvOneDGlobal::solver->SetSolution(eqNumbers[1], value);
@@ -333,6 +336,7 @@ void cvOneDMthModelBase::ApplyBoundaryConditions(){
       // for these BC the Inlet term doesn't have to be specialized
       // so same treatment as regular Essential BC like in Brooke's
       value = 0.0;  // RHS corresponding to imposed Essential BC
+        // TODO Here is also one inflow assumption
       if(cvOneDBFSolver::inletBCtype == BoundCondTypeScope::FLOW or cvOneDBFSolver::inletBCtype == BoundCondTypeScope::COUPLING_3D_1D){
         GetNodalEquationNumbers( 0, eqNumbers, 0);
         cvOneDGlobal::solver->SetSolution( eqNumbers[1], value);
