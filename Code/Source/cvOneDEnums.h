@@ -111,6 +111,7 @@ struct BoundCondTypeScope{
     PRESSURE_WAVE   = 5, // pressure wave in time
     RCR             = 6, // RCR or Windkessel model, without assuming periodicity
     CORONARY        = 9, // Coronary BC, Jongmin Seo & Hyunjin Kim
+    INFLOW          =10, // Inflow Condition at beginning of segment
     NOBOUND 
   };
 };

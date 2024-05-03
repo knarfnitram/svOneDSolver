@@ -90,6 +90,8 @@ int cvOneDModelManager::CreateSegment(char   *segName,long segID, double  segLen
     boundT = BoundCondTypeScope::RCR;
   }else if(!strcmp(boundType, "CORONARY")){
     boundT = BoundCondTypeScope::CORONARY;
+  }else if(!strcmp(boundType, "FLOW")) {
+      boundT = BoundCondTypeScope::FLOW;
   }else{
     return CV_ERROR;
   }
@@ -268,7 +270,7 @@ int cvOneDModelManager::SolveModel(double dt, long stepSize,
   cvOneDBFSolver::SetMaxStep(maxStep);
   cvOneDBFSolver::SetQuadPoints(quadPoints);
   cvOneDBFSolver::SetInletBCType(boundT);
-  cvOneDBFSolver::DefineInletFlow(times, values, len);
+  //cvOneDBFSolver::DefineInletFlow(times, values, len);
   cvOneDBFSolver::SetConvergenceCriteria(conv);
 
   cvOneDGlobal::isSolving = true;

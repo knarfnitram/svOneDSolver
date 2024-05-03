@@ -82,6 +82,7 @@ vector<cvOneDMthModelBase*>   cvOneDBFSolver::mathModels;
 vector<cvOneDSubdomain*>      cvOneDBFSolver::subdomainList;
 vector<cvOneDFEAJoint*>       cvOneDBFSolver::jointList;
 vector<int>                   cvOneDBFSolver::outletList;
+vector<int>                   cvOneDBFSolver::inletList;
 double                        cvOneDBFSolver::currentTime = 0;
 double                        cvOneDBFSolver::deltaTime = 0;
 double                        cvOneDBFSolver::Period = 0;
@@ -1074,8 +1075,8 @@ void cvOneDBFSolver::DefineMthModels(){
   cvOneDMthSegmentModel* segM = new cvOneDMthSegmentModel(subdomainList, jointList, outletList, quadPoints);
 
   //specify inlet flow rate boundary condition with time
-  segM->SetInflowRate(flowTime, flowRate, numFlowPts, flowTime[numFlowPts-1]);
-  Period = flowTime[numFlowPts-1];
+  //segM->SetInflowRate(flowTime, flowRate, numFlowPts, flowTime[numFlowPts-1]);
+  //Period = flowTime[numFlowPts-1];
 
   cvOneDMthBranchModel* branchM = new cvOneDMthBranchModel(subdomainList, jointList, outletList);
   AddOneModel(segM);
@@ -1095,6 +1096,7 @@ void cvOneDBFSolver::QuerryModelInformation(void)
 
   jointList.resize(0);
   outletList.resize(0);
+  inletList.resize(0);
   subdomainList.resize(0);
 
     printf("\n");
@@ -1202,14 +1204,15 @@ void cvOneDBFSolver::QuerryModelInformation(void)
         seg->getBoundPressureValues(&pres,&time,&num);
         subdomain ->SetBoundPresWave(time, pres, num);
 
-      }else if(boundT == BoundCondTypeScope::CORONARY){// Jongmin & Hyunjin
-        double* time;
-        double* p_lv;
-        int num;
-        seg->getBoundCoronaryValues(&p_lv, &time, &num);
-        subdomain->SetBoundCoronaryValues(time, p_lv,num);
-        cout<<"CORONARY boundary condition"<<endl;
-
+      }else if(boundT == BoundCondTypeScope::CORONARY) {// Jongmin & Hyunjin
+          double *time;
+          double *p_lv;
+          int num;
+          seg->getBoundCoronaryValues(&p_lv, &time, &num);
+          subdomain->SetBoundCoronaryValues(time, p_lv, num);
+          cout << "CORONARY boundary condition" << endl;
+      }else if(boundT == BoundCondTypeScope::INFLOW){
+          // TODO here we could add the flowrate to the segment
       }else{
         subdomain -> SetBoundValue(boundV);
       }

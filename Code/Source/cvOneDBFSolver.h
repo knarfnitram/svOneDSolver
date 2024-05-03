@@ -118,6 +118,7 @@ class cvOneDBFSolver{
     static vector<cvOneDSubdomain*> subdomainList;
     static vector<cvOneDFEAJoint*> jointList;
     static vector<int> outletList;
+    static vector<int> inletList;
     static cvOneDFEAVector *currentSolution;
     static cvOneDFEAVector *previousSolution;
     static cvOneDFEAVector *increment;

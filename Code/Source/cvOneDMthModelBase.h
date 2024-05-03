@@ -91,6 +91,7 @@ class cvOneDMthModelBase{
     vector<cvOneDSubdomain*> subdomainList;
     vector<cvOneDFEAJoint*> jointList;
     vector<int> outletList;
+    vector<int> inletList;
     // Placement of equations in the globalsystem
     long* equationNumbers;
 
