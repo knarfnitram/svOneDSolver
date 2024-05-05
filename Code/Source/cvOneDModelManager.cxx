@@ -151,9 +151,14 @@ int cvOneDModelManager::CreateSegment(char   *segName,long segID, double  segLen
   case BoundCondTypeScope::PRESSURE_WAVE:
       seg->setBoundPressureValue(value,time,num);
       break;
-  case BoundCondType::COUPLING_1D_3D:
+  case BoundCondTypeScope::COUPLING_1D_3D:
       seg -> setBoundValue(value[0]);
       break;
+  case BoundCondTypeScope::COUPLING_3D_1D:
+      seg -> setBoundValue(value[0]);
+      seg[0].coupling_ID = (int) value[0];
+      std::cout << "segment: "<< segID <<" COUPLING_3D_1D: "<<  (int) value[0] <<std::endl;
+        break;
   case BoundCondTypeScope::RESISTANCE_TIME:
       seg->setBoundResistanceValue(value,time,num);
       break;

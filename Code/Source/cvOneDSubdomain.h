@@ -107,7 +107,10 @@ class cvOneDSubdomain{
 	void SetBoundRCRValues(double *rcr, int num);//added IV 050803
 	void SetBoundWaveValues(double *wave, int num);//added IV 080603
     void SetBoundResistPdValues(double *value, int num); //added wgyang 2019/4
+    void SetCouplingID(int ID);
 
+    // store coupling ID
+    int GetCouplingID(){return couplingID;}
 
 	double GetBoundArea(){return boundValue;}
     double GetBoundResistance(){return boundValue;}
@@ -206,6 +209,7 @@ class cvOneDSubdomain{
   private:
     // The initial state & dimensions.
     int ID;
+    int couplingID;
     double S_initial;
     double S_final;
     double Q_initial;

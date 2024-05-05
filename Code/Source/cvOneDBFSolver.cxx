@@ -1250,14 +1250,17 @@ void cvOneDBFSolver::QuerryModelInformation(void)
           int num;
           seg->getBoundPressureValues(&pres, &time, &num);
           subdomain->SetBoundPresWave(time, pres, num);
-      }else if(boundT == BoundCondTypeScope::CORONARY){// Jongmin & Hyunjin
-        double* time;
-        double* p_lv;
-        int num;
-        seg->getBoundCoronaryValues(&p_lv, &time, &num);
-        subdomain->SetBoundCoronaryValues(time, p_lv,num);
-        cout<<"CORONARY boundary condition"<<endl;
+      }else if(boundT == BoundCondTypeScope::CORONARY) {// Jongmin & Hyunjin
+          double *time;
+          double *p_lv;
+          int num;
+          seg->getBoundCoronaryValues(&p_lv, &time, &num);
+          subdomain->SetBoundCoronaryValues(time, p_lv, num);
+          cout << "CORONARY boundary condition" << endl;
+      }else if(boundT == BoundCondTypeScope::COUPLING_3D_1D){
 
+          subdomain->SetCouplingID(seg->coupling_ID);
+          subdomain -> SetBoundValue(boundV);
       }else{
         subdomain -> SetBoundValue(boundV);
       }
@@ -1614,40 +1617,52 @@ void cvOneDBFSolver::SynchronizeDataofStep(int step){
 
     // simply check if the synchronizer is set up,
     // if not continue without updating the data
+    cout<<"synchronizer->Get_coupling_3d_1d_info(): "<< synchronizer->Get_coupling_3d_1d_info()<< endl;
     if(synchronizer->is_initialized() and synchronizer->Get_coupling_3d_1d_info()){
         cout<<"cvOneDBFSolver: flow rate"<< endl;
 
         int inflow_id =2;
 
         double new_flow=synchronizer->Get_3d_q_at_t(currentTime,inflow_id);
+        if(new_flow < 0){
+            new_flow=-new_flow;
+        }
 
-        mathModels[0]->UpdateInflowRate(new_flow,currentTime-deltaTime);
-        mathModels[0]->UpdateInflowRate(new_flow,currentTime);
+        mathModels[0]->SetCouplingFlowRate(new_flow,inflow_id);
 
         cout<<"cvOneDBFSolver: using new flow: "<<new_flow<<" from " << currentTime << std::endl;
+        // sometimes the sign might be wrong, but we cant support a negative incomping flowraate
 
-        // extract inlet condition
-        long eqNumbers[2];
+        for (vector<int>::iterator it=outletList.begin(); it!=outletList.end(); it++){
+            cvOneDSubdomain* sub = subdomainList[*it];
+            if(sub->GetBoundCondition()==BoundCondType::COUPLING_3D_1D) {
+                // extract inlet condition
+                long eqNumbers[2];
 
-        // TODO Here is also one inflow assumption
-        // inlet is set per default on the first position
-        mathModels[0]->GetNodalEquationNumbers( 0, eqNumbers, 0);
+                // TODO Here we are extracting the wrong flowrate and area
+                // inlet is set per default on the first position
 
-        // extract the area
-        cvOneDMaterial* curMat = subdomainList[0]->GetMaterial();
-        double area=currentSolution-> GetEntries()[eqNumbers[0]];
+                mathModels[0]->GetNodalEquationNumbers(0, eqNumbers, *it);
+                //mathModels[0]->GetNodalEquationNumbers(0, eqNumbers, 0);
 
-        // calculate the pressure with the material
-        synchronizer->Set_1D_q_at_t(currentTime-deltaTime,currentSolution->Get(1),inflow_id);
-        synchronizer->Set_1D_q_at_t(currentTime,currentSolution->Get(1),inflow_id);
-        synchronizer->Set_1D_p_at_t(currentTime,curMat->GetPressure(currentSolution->Get(2),0.0),inflow_id);
+                // extract the area
+                cvOneDMaterial *curMat = sub->GetMaterial();
+                double area = currentSolution->GetEntries()[eqNumbers[0]];
+                std::cout << "equation numbers:" << eqNumbers[0] << " " <<eqNumbers[1]<<std::endl;
+                std::cout << "solution at equation numbers:" << currentSolution->Get(eqNumbers[0]) << " " <<currentSolution->Get(eqNumbers[1])<<std::endl;
 
-        cout <<"cvOneDBFSolver: Time: "<<currentTime<<" " <<"pressure: " <<curMat->GetPressure(area,0.0) << endl;
-        cout <<"cvOneDBFSolver: Time: "<<currentTime<<" " <<"flow: " << mathModels[0]->GetFlowRate() << endl;
+                // calculate the pressure with the material
+                //synchronizer->Set_1D_q_at_t(currentTime-deltaTime,currentSolution->Get(1),inflow_id);
+                synchronizer->Set_1D_q_at_t(currentTime,  currentSolution->Get(eqNumbers[1]), inflow_id);
+                synchronizer->Set_1D_p_at_t(currentTime, curMat->GetPressure(currentSolution->Get(eqNumbers[0]), 0.0), inflow_id);
 
-        // TODO The flow in the synchronizer here is wrong?
-        //cout <<"cvOneDBFSolver: Time: "<<currentTime<<" " <<"flow: " <<Get << endl;
+                cout << "cvOneDBFSolver: Time: " << currentTime << " " << "pressure: " << curMat->GetPressure(area, 0.0)
+                     << endl;
+                cout << "cvOneDBFSolver: Time: " << currentTime << " " << "flow: "
+                     << mathModels[0]->GetCouplingFlowRate(inflow_id) << endl;
 
+            }
+        }
     }
 
     if(synchronizer->is_initialized() and synchronizer->Get_coupling_1d_3d_info()){

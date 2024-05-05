@@ -329,6 +329,10 @@ void cvOneDSubdomain::SetBoundResistPdValues(double *value, int num){//resistanc
 
 }
 
+void cvOneDSubdomain::SetCouplingID(int ID){
+    couplingID=ID;
+}
+
 
 // Returns interpolated pressure from specific boundary pressure wave
 double cvOneDSubdomain::GetPressure(double currentTime){

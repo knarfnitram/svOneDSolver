@@ -27,14 +27,25 @@ cvOneDSynchronizer::cvOneDSynchronizer(int time_steps, double dt, int max_ids, i
     // time step size
     dt_=dt;
 
-    q_1d = new double[max_time_steps*max_ids];
-    p_1d = new double[max_time_steps*max_ids];
-    q_3d = new double[max_time_steps*max_ids];
-    p_3d = new double[max_time_steps*max_ids];
+    q_1d = new double[max_time_steps*max_ids_];
+    p_1d = new double[max_time_steps*max_ids_];
+    q_3d = new double[max_time_steps*max_ids_];
+    p_3d = new double[max_time_steps*max_ids_];
     time_array = new double[max_time_steps+1];
     for (int i =0;i <max_time_steps; i++){
         time_array[i]=i*dt_;
     }
+    // make sure every variable is initialized correctly
+    for (int id =0;id <max_ids_; id++){
+        for (int i =0;i <max_time_steps; i++){
+            q_1d[i+max_time_steps*id]=0.0;
+            p_1d[i+max_time_steps*id]=0.0;
+            q_3d[i+max_time_steps*id]=0.0;
+            p_3d[i+max_time_steps*id]=0.0;
+        }
+    }
+
+
 
     switch (coupling_types) {
         case 1:
@@ -77,7 +88,7 @@ int cvOneDSynchronizer::Calculate_Step(double time){
 
 int cvOneDSynchronizer::Calculate_Step(double time, const int id){
     int step=Calculate_Step(time);
-    return step+step*id;
+    return step+max_time_steps*id;
 }
 
 
@@ -136,7 +147,7 @@ void cvOneDSynchronizer::Set_3d_p_at_t(double t,double p,int id){
 void cvOneDSynchronizer::Print_Item(string name, double * value, int id){
     std::cout << name << ": ";
     for (int i = 0; i < max_time_steps; ++i) {
-        std::cout << value[i+i*(id-1)] << " ";
+        std::cout << value[i+max_time_steps*(id-1)] << " ";
     }
     std::cout<< " " << std::endl;
 }
@@ -145,10 +156,10 @@ void cvOneDSynchronizer::Print_Item(string name, double * value, int id){
 void cvOneDSynchronizer::Print_Item(string name, double * value){
     std::cout << name << ": " <<std::endl;
     for (int id =1; id<=max_ids_;id++){
-        std::cout << id << ": ";
+        std::cout << id <<": ";
 
         for (int i = 0; i < max_time_steps; ++i) {
-            std::cout << value[i+i*(id-1)] << " ";
+            std::cout << value[i+max_time_steps*(id-1)] << " ";
         }
         std::cout<< " " << std::endl;
     }

@@ -76,11 +76,12 @@ class cvOneDMthModelBase{
     virtual void UpdateInflowRate(double flow, double search_time);
     virtual void UpdateCouplingPressure(double pressure);
     double GetCouplingPressure(){return coupling_pressure;}
+    double SetCouplingFlowRate(double flow,int coupling_id);
     virtual int Get_Pressure_Position();
     typeOfEquation GetType() const {return type;}
     double GetCycleTime() const {return cycleTime;}
 
-
+    double GetCouplingFlowRate(int coupling_id);
     double GetFlowRate();
   protected:
 
@@ -111,6 +112,7 @@ class cvOneDMthModelBase{
     double deltaTime;        // deltat
     double currentTime;    // t_{n+1}
     double *flrt, *time;
+    double coupling_flrt[10];
     double cycleTime;
     double coupling_pressure;
     int  nFlowPts; // added by bnsteel

@@ -225,7 +225,7 @@ class cvOneDSegment{
     // mesh element
     double   getMeshSpacing(long l);  
     bool IsOutlet;
-        
+    int coupling_ID;
  private:
 
     // These define the segment's Identity.

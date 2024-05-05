@@ -84,6 +84,7 @@ cvOneDSegment::cvOneDSegment(double IIA, double IOA, double IF, bool IO){
   impedanceLength = 0;
   rpCapRdLength = 0;
   waveValueLength = 0;
+  coupling_ID=0;
 }
 
 cvOneDSegment::~cvOneDSegment(){
