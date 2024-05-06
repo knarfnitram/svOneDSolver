@@ -75,7 +75,8 @@ public:
     // Print all items
     void Print_Item(string name, double * value);
 
-
+    // Print l2 norm between entries
+    void Print_Norm_of_Item(string name, double * value1, double * value2);
 
 private:
 

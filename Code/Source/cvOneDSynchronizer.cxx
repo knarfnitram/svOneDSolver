@@ -172,5 +172,19 @@ void cvOneDSynchronizer::Print() {
     Print_Item("q_3d",q_3d);
     Print_Item("p_1d",p_1d);
     Print_Item("p_3d",p_3d);
+    Print_Norm_of_Item("q",q_1d,q_3d);
+    Print_Norm_of_Item("p",p_1d,p_3d);
+}
 
+void cvOneDSynchronizer::Print_Norm_of_Item(string name, double * value1, double * value2){
+    std::cout <<"Print_Norm_of_Item "<< name << ": " <<std::endl;
+    for (int id =1; id<=max_ids_;id++){
+        std::cout << id <<": ";
+
+        for (int i = 0; i < max_time_steps; ++i) {
+            const double disp= abs( value1[i+max_time_steps*(id-1)]) - abs(value2[i+max_time_steps*(id-1)]);
+            std::cout << disp*disp << " ";
+        }
+        std::cout<< " " << std::endl;
+    }
 }
