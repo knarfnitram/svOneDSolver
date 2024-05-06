@@ -153,7 +153,6 @@ void cvOneDMthModelBase::SetBoundaryConditions(){
     // TODO Here is also one inflow assumption
   GetNodalEquationNumbers( 0, eqNumbers, 0);
   sub= subdomainList[0];
-  // TODO add here a loop for COUPLING Condition?
   switch(cvOneDBFSolver::inletBCtype){
     case BoundCondTypeScope::FLOW:
       (*currSolution)[eqNumbers[1]] = GetFlowRate();
@@ -187,6 +186,7 @@ void cvOneDMthModelBase::SetBoundaryConditions(){
         // store here the equation number
         // change
         GetNodalEquationNumbers(0, eqNumbers, *it);
+            std::cout << "I have the Coupling ID "<< sub->GetCouplingID() << " and get the value: " << GetCouplingFlowRate(sub->GetCouplingID()) << std::endl;
         (*currSolution)[eqNumbers[1]] = GetCouplingFlowRate(sub->GetCouplingID());
         break;
     case BoundCondTypeScope::COUPLING_1D_3D:
@@ -194,9 +194,9 @@ void cvOneDMthModelBase::SetBoundaryConditions(){
         std::cout << "Me updating the coupling pressure: "<< coupling_pressure << " to: " << sub->GetMaterial()->GetArea(coupling_pressure,1.0) << std::endl;
         (*currSolution)[eqNumbers[0]] = sub->GetBoundFlowRate();
         break;
-    //case BoundCondTypeScope::FLOW:
-      //(*currSolution)[eqNumbers[1]] = sub->GetBoundFlowRate();
-      //break;
+    case BoundCondTypeScope::FLOW:
+      (*currSolution)[eqNumbers[1]] = sub->GetBoundFlowRate();
+      break;
 
     case BoundCondTypeScope::RESISTANCE:
             if(cvOneDGlobal::CONSERVATION_FORM==0){
@@ -293,14 +293,14 @@ void cvOneDMthModelBase::ApplyBoundaryConditions(){
       value = 0.0;  // RHS corresponding to imposed Essential BC
 
       switch(sub->GetBoundCondition()){
-        case BoundCondType::COUPLING_1D_3D:
+        case BoundCondTypeScope::COUPLING_1D_3D:
         case BoundCondTypeScope::PRESSURE:
         case BoundCondTypeScope::PRESSURE_WAVE:
           cvOneDGlobal::solver->SetSolution( eqNumbers[0], value);
           break;
-          case BoundCondTypeScope::FLOW:
-          cvOneDGlobal::solver->SetSolution( eqNumbers[1], value);
-          break;
+          //case BoundCondTypeScope::FLOW:
+          //cvOneDGlobal::solver->SetSolution( eqNumbers[1], value);
+          //break;
         case BoundCondTypeScope::COUPLING_3D_1D:
             GetNodalEquationNumbers(0, eqNumbers, *it);
           cvOneDGlobal::solver->SetSolution( eqNumbers[1], value);
@@ -357,7 +357,7 @@ void cvOneDMthModelBase::ApplyBoundaryConditions(){
       // so same treatment as regular Essential BC like in Brooke's
       value = 0.0;  // RHS corresponding to imposed Essential BC
         // TODO Here is also one inflow assumption
-      if(cvOneDBFSolver::inletBCtype == BoundCondTypeScope::FLOW or cvOneDBFSolver::inletBCtype == BoundCondTypeScope::COUPLING_3D_1D){
+      if(cvOneDBFSolver::inletBCtype == BoundCondTypeScope::FLOW){
         GetNodalEquationNumbers( 0, eqNumbers, 0);
         cvOneDGlobal::solver->SetSolution( eqNumbers[1], value);
       }else if (cvOneDBFSolver::inletBCtype == BoundCondTypeScope::PRESSURE_WAVE){
@@ -436,6 +436,7 @@ void cvOneDMthModelBase::ApplyBoundaryConditions(){
             cvOneDGlobal::solver->SetSolution( eqNumbers[1], value);
             break;
             case BoundCondTypeScope::COUPLING_3D_1D:
+                GetNodalEquationNumbers(0, eqNumbers, *it);
                 cvOneDGlobal::solver->SetSolution( eqNumbers[1], value);
                 break;
 
@@ -710,9 +711,9 @@ double cvOneDMthModelBase::GetFlowRate(){
   double xi = (correctedTime - time[ptr]) / (time[ptr+1] - time[ptr]);
   // Return
   double result = flrt[ptr] + xi * (flrt[ptr+1] - flrt[ptr]);
-   // printf("Interpolation between : %e %e %e\n",xi,flrt[ptr],flrt[ptr+1]);
-  //printf("Result Flow: %e\n",result);
-   // printf("Result Time: %e\n",correctedTime);
+   printf("Interpolation between : %e %e %e\n",xi,flrt[ptr],flrt[ptr+1]);
+  printf("Result Flow: %e\n",result);
+  printf("Result Time: %e\n",correctedTime);
   return result;
 
 }

@@ -1257,11 +1257,14 @@ void cvOneDBFSolver::QuerryModelInformation(void)
           seg->getBoundCoronaryValues(&p_lv, &time, &num);
           subdomain->SetBoundCoronaryValues(time, p_lv, num);
           cout << "CORONARY boundary condition" << endl;
-      }else if(boundT == BoundCondTypeScope::COUPLING_3D_1D){
+      }else if(boundT == BoundCondTypeScope::COUPLING_3D_1D) {
 
           subdomain->SetCouplingID(seg->coupling_ID);
-          subdomain -> SetBoundValue(boundV);
-      }else{
+          subdomain->SetBoundValue(boundV);
+      }else if(boundT == BoundCondTypeScope::COUPLING_1D_3D){
+              subdomain->SetCouplingID(seg->coupling_ID);
+              subdomain -> SetBoundValue(boundV);
+          }else{
         subdomain -> SetBoundValue(boundV);
       }
 
@@ -1621,21 +1624,26 @@ void cvOneDBFSolver::SynchronizeDataofStep(int step){
     if(synchronizer->is_initialized() and synchronizer->Get_coupling_3d_1d_info()){
         cout<<"cvOneDBFSolver: flow rate"<< endl;
 
-        int inflow_id =2;
 
-        double new_flow=synchronizer->Get_3d_q_at_t(currentTime,inflow_id);
-        if(new_flow < 0){
-            new_flow=-new_flow;
-        }
-
-        mathModels[0]->SetCouplingFlowRate(new_flow,inflow_id);
-
-        cout<<"cvOneDBFSolver: using new flow: "<<new_flow<<" from " << currentTime << std::endl;
         // sometimes the sign might be wrong, but we cant support a negative incomping flowraate
 
         for (vector<int>::iterator it=outletList.begin(); it!=outletList.end(); it++){
+
+
             cvOneDSubdomain* sub = subdomainList[*it];
             if(sub->GetBoundCondition()==BoundCondType::COUPLING_3D_1D) {
+
+                int inflow_id =sub->GetCouplingID();
+
+                double new_flow=synchronizer->Get_3d_q_at_t(currentTime,inflow_id);
+                if(new_flow < 0){
+                    new_flow=-new_flow;
+                }
+
+                mathModels[0]->SetCouplingFlowRate(new_flow,inflow_id);
+
+                cout<<"cvOneDBFSolver: using new flow: "<<new_flow<<" from " << currentTime << std::endl;
+
                 // extract inlet condition
                 long eqNumbers[2];
 
@@ -1666,23 +1674,16 @@ void cvOneDBFSolver::SynchronizeDataofStep(int step){
     }
 
     if(synchronizer->is_initialized() and synchronizer->Get_coupling_1d_3d_info()){
-        int inflow_id =1;
-        std::cout<< "starting to couple 1d-3d"<<std::endl;
-        // TODO couple here
-        // loop here over math modesl/ segments and check for condition
-        double new_pressure=synchronizer->Get_3d_p_at_t(currentTime,inflow_id);
-        std::cout<< "new_pressure:"<<new_pressure<<std::endl;
-        mathModels[0]->UpdateCouplingPressure(new_pressure);
-        // TODO fix value which is responsibe for pressure bc
-        long eqNumbers[2];  // two degress of freedom per node
 
-        // TODO Here is also one inflow assumption
-        // Set up Inlet Dirichlet boundary condition (the default is flow rate)
-        mathModels[0]->GetNodalEquationNumbers( 0, eqNumbers, 0);
+        long eqNumbers[2];  // two degress of freedom per node
 
         for (vector<int>::iterator it=outletList.begin(); it!=outletList.end(); it++){
             cvOneDSubdomain* sub = subdomainList[*it];
             if(sub->GetBoundCondition()==BoundCondType::COUPLING_1D_3D) {
+                std::cout<< "starting to couple 1d-3d:" << sub->GetCouplingID()<<std::endl;
+                double new_pressure=synchronizer->Get_3d_p_at_t(currentTime,sub->GetCouplingID());
+                std::cout<< "new_pressure:"<<new_pressure<<std::endl;
+                mathModels[0]->UpdateCouplingPressure(new_pressure);
                 mathModels[0]->GetNodalEquationNumbers(subdomainList[*it]->GetNumberOfNodes() - 1, eqNumbers, *it);
                 std::cout << "equation numbers:" << eqNumbers[0] << " " <<eqNumbers[1]<<std::endl;
                 std::cout << "solution at equation numbers:" << currentSolution->Get(eqNumbers[0]) << " " <<currentSolution->Get(eqNumbers[1])<<std::endl;
@@ -1691,9 +1692,9 @@ void cvOneDBFSolver::SynchronizeDataofStep(int step){
                 cvOneDMaterial* curMat = subdomainList[*it]->GetMaterial();
                 // TODO clearify when to take [0] and [1]
                 // TODO check again if right A(p) is set as vector
-                synchronizer->Set_1D_q_at_t(currentTime, currentSolution->Get(eqNumbers[1]), inflow_id);
+                synchronizer->Set_1D_q_at_t(currentTime, currentSolution->Get(eqNumbers[1]), sub->GetCouplingID());
                 std::cout<< currentSolution->Get(eqNumbers[0]) << " " << sub->GetLength()<< std::endl;
-                synchronizer->Set_1D_p_at_t(currentTime, curMat->GetPressure(currentSolution-> GetEntries()[(eqNumbers[0])], 1.0), inflow_id);
+                synchronizer->Set_1D_p_at_t(currentTime, curMat->GetPressure(currentSolution-> GetEntries()[(eqNumbers[0])], 1.0), sub->GetCouplingID());
                 std::cout << "Pressure:" << curMat->GetPressure(currentSolution-> GetEntries()[(eqNumbers[0])], 1.0) << " flow: " <<currentSolution->Get(eqNumbers[1])<<std::endl;
             }
         }

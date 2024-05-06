@@ -152,12 +152,17 @@ int cvOneDModelManager::CreateSegment(char   *segName,long segID, double  segLen
       seg->setBoundPressureValue(value,time,num);
       break;
   case BoundCondTypeScope::COUPLING_1D_3D:
-      seg -> setBoundValue(value[0]);
+      seg -> setBoundValue(time[0]);
+          seg[0].coupling_ID = (int) value[0];
+          std::cout << "segment: "<< segID <<" COUPLING_1D_3D: " <<  value[0] <<std::endl;
+          printf("Initial Value: %f",value[0]);
       break;
   case BoundCondTypeScope::COUPLING_3D_1D:
-      seg -> setBoundValue(value[0]);
+      seg -> setBoundValue(time[0]);
       seg[0].coupling_ID = (int) value[0];
-      std::cout << "segment: "<< segID <<" COUPLING_3D_1D: "<<  (int) value[0] <<std::endl;
+
+      std::cout << "segment: "<< segID <<" COUPLING_3D_1D: " <<  value[0] <<std::endl;
+          printf("Initial Value: %f",value[0]);
         break;
   case BoundCondTypeScope::RESISTANCE_TIME:
       seg->setBoundResistanceValue(value,time,num);
@@ -176,7 +181,7 @@ int cvOneDModelManager::CreateSegment(char   *segName,long segID, double  segLen
 
   default:
       seg -> setBoundValue(value[0]);
-          printf("yes-pressure: %f",value[0]);
+
       break;
   }
 

@@ -606,7 +606,8 @@ void cvOneDMthSegmentModel::FormElement(long element,
 			}
 
 			if(bound==BoundCondTypeScope::NOBOUND||bound==BoundCondTypeScope::PRESSURE||bound==BoundCondTypeScope::COUPLING_1D_3D
-					||bound==BoundCondTypeScope::FLOW||bound==BoundCondType::COUPLING_3D_1D){
+					||bound==BoundCondTypeScope::FLOW){
+                //TODO do we need Coupling 3D_1D here?
 				//Outlet flux term (at z=z_outlet) which is the linearized F-KU
 				if (element == (sub->GetNumberOfElements())-1){
 					double z = sub->GetOutletZ();
