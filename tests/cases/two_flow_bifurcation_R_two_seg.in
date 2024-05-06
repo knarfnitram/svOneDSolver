@@ -1,0 +1,81 @@
+# Modelled from aortic bifurcation test case from 
+# Xiao, N., Alastruey, J., Figueroa, C.A. A systematic comparison between 1-D and 3-D hemodynamics in compliant arterial models. Int J Numer Meth Bio, 2014; 30:204-231
+
+MODEL two_flow_bifurcation_R_two
+
+NODE 0 0.0 0.0 0.0
+NODE 1 0.0 0.0 -8.6
+NODE 2 0.0 -3.25280917510326 -7.85297602634594
+NODE 3 0.0 3.25280917510326 -7.85297602634594
+NODE 4 1.0 0.0 0.0
+NODE 5 1.0 0.0 -8.6
+NODE 6 1.0 -3.25280917510326 -7.85297602634594
+NODE 7 1.0 3.25280917510326 -7.85297602634594
+
+JOINT JOINT1 1 INSEGS OUTSEGS
+JOINTINLET INSEGS 2 0 1
+JOINTOUTLET OUTSEGS 1 2
+
+JOINT JOINT2 1 INSEGS1 OUTSEGS1
+JOINTINLET INSEGS1 2 3 4
+JOINTOUTLET OUTSEGS1 1 5
+
+
+SEGMENT seg0 0 8.5 2 2 1 1.13097335529233 1.13097335529233 0.0 MAT1 NONE 0.0 0 0 FLOW STEADY_FLOW
+SEGMENT seg1 1 8.5 2 3 1 1.13097335529233 1.13097335529233 0.0 MAT1 NONE 0.0 0 0 FLOW STEADY_FLOW
+SEGMENT seg2 2 8.6 2 1 0 2.32352192659501 2.32352192659501 0.0 MAT1 NONE 0.0 0 0 RESISTANCE R_VALS
+
+SEGMENT seg3 3 8.5 2 6 5 1.13097335529233 1.13097335529233 0.0 MAT1 NONE 0.0 0 0 FLOW STEADY_FLOW
+SEGMENT seg4 4 8.5 2 7 5 1.13097335529233 1.13097335529233 0.0 MAT1 NONE 0.0 0 0 FLOW STEADY_FLOW
+SEGMENT seg5 5 8.6 2 5 4 2.32352192659501 2.32352192659501 0.0 MAT1 NONE 0.0 0 0 RESISTANCE R_VALS
+
+DATATABLE R_VALS LIST
+0.0 991.36
+ENDDATATABLE
+
+DATATABLE STEADY_FLOW LIST
+0.0 4.0
+1.0 3.0
+ENDDATATABLE
+
+
+
+# Ref Pressure 1333.22*85 where 85 is in mmHg
+# Rigid for now, but can be elastic with the following parameters:
+# h_0 = 1.032mm, E_0 = 500 kPa, h_1 = h_2 = 0.72 mm, E_1 = E_2 = 700 kPa
+MATERIAL MAT1 OLUFSEN 1.06 0.04 0 2.0 1.0e15 -20 1e9
+
+SOLVEROPTIONS 0.1 1 5 2 STEADY_FLOW FLOW 1.0e-6 1 1
+
+OUTPUT BOTH
+
+
+# analytical solution
+
+# parameters
+# viscosity		mu	0.04
+# seg0 length		L_0	8.6
+# seg0 radius		r_0	0.86
+# seg1 length		L_1	8.5 (same as seg2 length)
+# seg1 radius		r_1	0.6 (same as seg2 radius)
+# resistance BC		R	991.36
+# steady Inlet Flow	Q_0	7.985
+# Distal pressure	Pd	0
+
+# reference solution
+# assumes no pressure losses at bifurcation and purely parallel resistances
+# total 1D model resistance	Rtot = (R_0 + 0.5*(R_2 + R)
+# Pressure at junction		P_0_out = P_1_in = P_2_in
+
+# Results to be checked
+# P_0_in	3997.46433118937
+# P_0_out	3984.67700709878
+# P_1_in	3984.67700709878 (same as P_2_in)
+# P_1_out	3958.0048 (same as P_2_out because symmetric)
+# Q_1_in	3.9925 (same as Q_1_out)
+
+
+
+
+
+
