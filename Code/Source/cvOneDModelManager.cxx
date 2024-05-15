@@ -155,7 +155,7 @@ int cvOneDModelManager::CreateSegment(char   *segName,long segID, double  segLen
       seg -> setBoundValue(time[0]);
           seg[0].coupling_ID = (int) value[0];
           std::cout << "segment: "<< segID <<" COUPLING_1D_3D: " <<  value[0] <<std::endl;
-          printf("Initial Value: %f",value[0]);
+          printf("Initial Value: %f",time[0]);
       break;
   case BoundCondTypeScope::COUPLING_3D_1D:
       seg -> setBoundValue(time[0]);

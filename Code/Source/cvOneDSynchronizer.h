@@ -78,6 +78,7 @@ public:
     // Print l2 norm between entries
     void Print_Norm_of_Item(string name, double * value1, double * value2);
 
+
 private:
 
     // maximum time steps
@@ -88,7 +89,7 @@ private:
 
     // flow array
     double* q_1d;
-    double* q_3d=NULL;
+    double* q_3d;
 
     // pressure array
     double* p_3d;

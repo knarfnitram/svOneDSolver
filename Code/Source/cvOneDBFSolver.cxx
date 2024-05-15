@@ -1633,7 +1633,8 @@ void cvOneDBFSolver::SynchronizeDataofStep(int step){
             cvOneDSubdomain* sub = subdomainList[*it];
             if(sub->GetBoundCondition()==BoundCondType::COUPLING_3D_1D) {
 
-                int inflow_id =sub->GetCouplingID();
+                int inflow_id = sub->GetCouplingID();
+                cout<<"cvOneDBFSolver: COUPLING_3D_1D: " << sub->GetCouplingID() << std::endl;
 
                 double new_flow=synchronizer->Get_3d_q_at_t(currentTime,inflow_id);
                 if(new_flow < 0){
