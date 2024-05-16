@@ -1620,7 +1620,7 @@ void cvOneDBFSolver::SynchronizeDataofStep(int step){
 
     // simply check if the synchronizer is set up,
     // if not continue without updating the data
-    cout<<"synchronizer->Get_coupling_3d_1d_info(): "<< synchronizer->Get_coupling_3d_1d_info()<< endl;
+    //cout<<"synchronizer->Get_coupling_3d_1d_info(): "<< synchronizer->Get_coupling_3d_1d_info()<< endl;
     if(synchronizer->is_initialized() and synchronizer->Get_coupling_3d_1d_info()){
 
 

@@ -186,12 +186,12 @@ void cvOneDMthModelBase::SetBoundaryConditions(){
         // store here the equation number
         // change
         GetNodalEquationNumbers(0, eqNumbers, *it);
-            std::cout << "I have the Coupling ID "<< sub->GetCouplingID() << " and get the value: " << GetCouplingFlowRate(sub->GetCouplingID()) << std::endl;
+           // std::cout << "I have the Coupling ID "<< sub->GetCouplingID() << " and get the value: " << GetCouplingFlowRate(sub->GetCouplingID()) << std::endl;
         (*currSolution)[eqNumbers[1]] = GetCouplingFlowRate(sub->GetCouplingID());
         break;
     case BoundCondTypeScope::COUPLING_1D_3D:
         sub->SetBoundValue(coupling_pressure);
-        std::cout << "Me updating the coupling pressure: "<< coupling_pressure << " to: " << sub->GetMaterial()->GetArea(coupling_pressure,1.0) << std::endl;
+        //std::cout << "Me updating the coupling pressure: "<< coupling_pressure << " to: " << sub->GetMaterial()->GetArea(coupling_pressure,1.0) << std::endl;
         (*currSolution)[eqNumbers[0]] = sub->GetBoundFlowRate();
         break;
     case BoundCondTypeScope::FLOW:
@@ -705,9 +705,6 @@ double cvOneDMthModelBase::GetFlowRate(){
   double xi = (correctedTime - time[ptr]) / (time[ptr+1] - time[ptr]);
   // Return
   double result = flrt[ptr] + xi * (flrt[ptr+1] - flrt[ptr]);
-   printf("Interpolation between : %e %e %e\n",xi,flrt[ptr],flrt[ptr+1]);
-  printf("Result Flow: %e\n",result);
-  printf("Result Time: %e\n",correctedTime);
   return result;
 
 }
