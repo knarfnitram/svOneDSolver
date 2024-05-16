@@ -102,24 +102,23 @@ bool cvOneDSynchronizer::is_initialized(void){
 
 // get the coupling flow at specific time point
 double cvOneDSynchronizer::Get_3d_p_at_t(double t,int id){
-    //std::cout<<"you requested 3d q at time step:"-Calculate_Step(t,id)<<"";
     return p_3d[Calculate_Step(t,id-1)];
 }
 
 // get the coupling flow at specific time point
 double cvOneDSynchronizer::Get_3d_q_at_t(double t,int id){
-    //std::cout<<"you requested 3d q at time step:"-Calculate_Step(t,id)<<"";
+
     return q_3d[Calculate_Step(t,id-1)];
 }
 
 // return the pressure from the 1d simulation
 double cvOneDSynchronizer::Get_1d_p_at_t(double t,int id){
-    std::cout<<"you requested 1d presure data at time step:"-Calculate_Step(t,id)<<"";
+
     return p_1d[Calculate_Step(t,id-1)];
 }
 
 double cvOneDSynchronizer::Get_1d_q_at_t(double t,int id){
-    std::cout<<"you requested 1d q data at time step:"-Calculate_Step(t,id)<<"";
+
     return q_1d[Calculate_Step(t,id-1)];
 }
 

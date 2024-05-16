@@ -670,14 +670,13 @@ void cvOneDMthModelBase::UpdateInflowRate(double flow,double search_time) {
             //break;
         }
     }
-    cout<<"Time and flow rate before: " << " " << time[step] << ", " << flrt[step] << "flow: "<<flow<< endl;
+
     if(step >nFlowPts || step<0){
         printf("%d exceeds the array %d size of inflow rates ",step, nFlowPts);
         throw ("no segfault.");
     }
 
     flrt[step] = flow;
-    cout<<"Time and flow rate after update : " << flrt[step] << endl;
 }
 
 double cvOneDMthModelBase::GetFlowRate(){
@@ -688,11 +687,6 @@ double cvOneDMthModelBase::GetFlowRate(){
     cout<<"Time and flow rate: " << time << ", " << flrt << endl;
     exit(1);
   }
-  std::cout <<"flrt"<<std::endl;
-  for(int i=0;i<nFlowPts;i++){
-      std::cout << flrt[i]<<" ";
-  }
-    std::cout << '\n';
 
   // Flow rate is assumed to be periodic
   double correctedTime = currentTime - static_cast<long>(currentTime / cycleTime) * cycleTime;
