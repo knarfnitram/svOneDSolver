@@ -181,7 +181,7 @@ void cvOneDSynchronizer::Print_Norm_of_Item(string name, double * value1, double
         std::cout << id <<": ";
 
         for (int i = 0; i < max_time_steps; ++i) {
-            const double disp= abs( value1[i+max_time_steps*(id-1)]) - abs(value2[i+max_time_steps*(id-1)]);
+            const double disp=abs( abs( value1[i+max_time_steps*(id-1)]) - abs(value2[i+max_time_steps*(id-1)]));
             std::cout << disp << " ";
         }
         std::cout<< " " << std::endl;
