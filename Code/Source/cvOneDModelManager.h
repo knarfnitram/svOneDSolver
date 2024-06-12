@@ -113,6 +113,9 @@ class cvOneDModelManager{
     void DoPostProcessing(void){
         cvOneDBFSolver::DoPostProcessing();
     }
+    void DoPostProcessingofStep(int step){
+        cvOneDBFSolver::postprocess_single_VTK_XML3D_FILE(step,true);
+    }
 };
 
 #endif // CVONEDMODELMANAGER_H

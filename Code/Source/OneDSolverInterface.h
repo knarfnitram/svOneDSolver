@@ -82,6 +82,9 @@ extern "C" {
         void DoPostProcessing(void){
             manager->DoPostProcessing();
         }
+        void DoPostProcessingofStep(int step){
+            manager->DoPostProcessingofStep(step);
+        }
 
         cvOneDModelManager *manager;
 

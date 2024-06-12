@@ -119,6 +119,7 @@ class cvOneDBFSolver{
     static void postprocess_VTK();
     static void postprocess_VTK_XML3D_ONEFILE();
     static void postprocess_VTK_XML3D_MULTIPLEFILES();
+    static void postprocess_single_VTK_XML3D_FILE(int step, bool write_last);
 
     // Find Segment index given the ID
     static int getSegmentIndex(int segID);
@@ -175,6 +176,7 @@ class cvOneDBFSolver{
     //static double normf ;
     //static double norms ;
 
+    static cvStringVec fileList_;
 
 };
 
