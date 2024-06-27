@@ -65,6 +65,8 @@ public:
 
     void Print(void);
 
+    void Print_at_timestep(int timestep);
+
     void Print_id(int id);
 
     int get_max_time_steps(void){return max_time_steps;};
@@ -73,10 +75,10 @@ public:
     void Print_Item(string name, double * value, int id);
 
     // Print all items
-    void Print_Item(string name, double * value);
+    void Print_Item(string name, double * value,int timestep_min,int timestep_max);
 
     // Print l2 norm between entries
-    void Print_Norm_of_Item(string name, double * value1, double * value2);
+    void Print_Norm_of_Item(string name, double * value1, double * value2,int timestep_min,int timestep_max);
 
 
 private:

@@ -143,21 +143,12 @@ void cvOneDSynchronizer::Set_3d_p_at_t(double t,double p,int id){
     p_3d[Calculate_Step(t,id-1)]=p;
 }
 
-void cvOneDSynchronizer::Print_Item(string name, double * value, int id){
-    std::cout << name << ": ";
-    for (int i = 0; i < max_time_steps; ++i) {
-        std::cout << value[i+max_time_steps*(id-1)] << " ";
-    }
-    std::cout<< " " << std::endl;
-}
-
-
-void cvOneDSynchronizer::Print_Item(string name, double * value){
+void cvOneDSynchronizer::Print_Item(string name, double * value,int timestep_min,int timestep_max){
     std::cout << name << ": " <<std::endl;
     for (int id =1; id<=max_ids_;id++){
         std::cout << id <<": ";
 
-        for (int i = 0; i < max_time_steps; ++i) {
+        for (int i = timestep_min; i < timestep_max; ++i) {
             std::cout << value[i+max_time_steps*(id-1)] << " ";
         }
         std::cout<< " " << std::endl;
@@ -166,21 +157,30 @@ void cvOneDSynchronizer::Print_Item(string name, double * value){
 
 void cvOneDSynchronizer::Print() {
 
-
-    Print_Item("q_1d",q_1d);
-    Print_Item("q_3d",q_3d);
-    Print_Item("p_1d",p_1d);
-    Print_Item("p_3d",p_3d);
-    Print_Norm_of_Item("q",q_1d,q_3d);
-    Print_Norm_of_Item("p",p_1d,p_3d);
+    Print_Item("q_1d",q_1d,0,max_time_steps);
+    Print_Item("q_3d",q_3d,0,max_time_steps);
+    Print_Item("p_1d",p_1d,0,max_time_steps);
+    Print_Item("p_3d",p_3d,0,max_time_steps);
+    Print_Norm_of_Item("q",q_1d,q_3d,0,max_time_steps);
+    Print_Norm_of_Item("p",p_1d,p_3d,0,max_time_steps);
 }
 
-void cvOneDSynchronizer::Print_Norm_of_Item(string name, double * value1, double * value2){
+void cvOneDSynchronizer::Print_at_timestep(int time_step) {
+    std::cout<<"Time Step: "<<time_step<<std::endl;
+    Print_Item("q_1d",q_1d,time_step,time_step+1);
+    Print_Item("q_3d",q_3d,time_step,time_step+1);
+    Print_Item("p_1d",p_1d,time_step,time_step+1);
+    Print_Item("p_3d",p_3d,time_step,time_step+1);
+    Print_Norm_of_Item("q",q_1d,q_3d,time_step,time_step+1);
+    Print_Norm_of_Item("p",p_1d,p_3d,time_step,time_step+1);
+}
+
+void cvOneDSynchronizer::Print_Norm_of_Item(string name, double * value1, double * value2,int timestep_min,int timestep_max){
     std::cout <<"Print_Norm_of_Item "<< name << ": " <<std::endl;
     for (int id =1; id<=max_ids_;id++){
         std::cout << id <<": ";
 
-        for (int i = 0; i < max_time_steps; ++i) {
+        for (int i = timestep_min; i < timestep_max; ++i) {
             const double disp=abs( abs( value1[i+max_time_steps*(id-1)]) - abs(value2[i+max_time_steps*(id-1)]));
             std::cout << disp << " ";
         }

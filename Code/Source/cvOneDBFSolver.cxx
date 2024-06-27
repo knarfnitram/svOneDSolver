@@ -1686,9 +1686,9 @@ void cvOneDBFSolver::SynchronizeDataofStep(int step){
                 // TODO clearify when to take [0] and [1]
                 // TODO check again if right A(p) is set as vector
                 synchronizer->Set_1D_q_at_t(currentTime, currentSolution->Get(eqNumbers[1]), sub->GetCouplingID());
-                std::cout<< currentSolution->Get(eqNumbers[0]) << " " << sub->GetLength()<< std::endl;
-                synchronizer->Set_1D_p_at_t(currentTime, curMat->GetPressure(currentSolution-> GetEntries()[(eqNumbers[0])], 1.0), sub->GetCouplingID());
+                //synchronizer->Set_1D_p_at_t(currentTime, curMat->GetPressure(currentSolution-> GetEntries()[(eqNumbers[0])], 1.0), sub->GetCouplingID());
                 if(cvOneDGlobal::debugMode) {
+                    std::cout<< currentSolution->Get(eqNumbers[0]) << " " << sub->GetLength()<< std::endl;
                     std::cout << "starting to couple 1d-3d:" << sub->GetCouplingID() << std::endl;
                     std::cout << "equation numbers:" << eqNumbers[0] << " " << eqNumbers[1] << std::endl;
                     std::cout << "solution at equation numbers:" << currentSolution->Get(eqNumbers[0]) << " "

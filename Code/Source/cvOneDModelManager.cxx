@@ -162,7 +162,7 @@ int cvOneDModelManager::CreateSegment(char   *segName,long segID, double  segLen
       seg[0].coupling_ID = (int) value[0];
 
       std::cout << "segment: "<< segID <<" COUPLING_3D_1D: " <<  value[0] <<std::endl;
-          printf("Initial Value: %f",value[0]);
+          printf("Initial Value: %f",time[0]);
         break;
   case BoundCondTypeScope::RESISTANCE_TIME:
       seg->setBoundResistanceValue(value,time,num);
