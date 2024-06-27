@@ -197,7 +197,6 @@ void cvOneDMthModelBase::SetBoundaryConditions(){
     case BoundCondTypeScope::FLOW:
       (*currSolution)[eqNumbers[1]] = sub->GetBoundFlowRate();
       break;
-
     case BoundCondTypeScope::RESISTANCE:
             if(cvOneDGlobal::CONSERVATION_FORM==0){
         currS = (*currSolution)[eqNumbers[0]];
@@ -214,7 +213,6 @@ void cvOneDMthModelBase::SetBoundaryConditions(){
         (*currSolution)[eqNumbers[1]] = currP/resistance;
         }
       break;
-
     case BoundCondTypeScope::RCR:
       break;
     default:
@@ -298,9 +296,9 @@ void cvOneDMthModelBase::ApplyBoundaryConditions(){
         case BoundCondTypeScope::PRESSURE_WAVE:
           cvOneDGlobal::solver->SetSolution( eqNumbers[0], value);
           break;
-          //case BoundCondTypeScope::FLOW:
-          //cvOneDGlobal::solver->SetSolution( eqNumbers[1], value);
-          //break;
+          case BoundCondTypeScope::FLOW:
+          cvOneDGlobal::solver->SetSolution( eqNumbers[1], value);
+          break;
         case BoundCondTypeScope::COUPLING_3D_1D:
             GetNodalEquationNumbers(0, eqNumbers, *it);
           cvOneDGlobal::solver->SetSolution( eqNumbers[1], value);
@@ -428,7 +426,7 @@ void cvOneDMthModelBase::ApplyBoundaryConditions(){
           // for these BC the Inlet term doesn't have to be specialized
           // so same treatment as regular Essential BC like in Brooke's
           case BoundCondTypeScope::PRESSURE:
-              case BoundCondTypeScope::COUPLING_1D_3D:
+          case BoundCondTypeScope::COUPLING_1D_3D:
           case BoundCondTypeScope::PRESSURE_WAVE:
             cvOneDGlobal::solver->SetSolution( eqNumbers[0], value);
             break;
